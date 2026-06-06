@@ -1,0 +1,76 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+env:
+  DOTNET_NOLOGO: true
+  DOTNET_SKIP_FIRST_TIME_EXPERIENCE: true
+  DOTNET_CLI_TELEMETRY_OPTOUT: true
+
+jobs:
+  build-test:
+    name: Build & Test
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup .NET 10
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '10.0.x'
+
+      - name: Restore
+        run: dotnet restore
+
+      - name: Format check
+        run: dotnet format --verify-no-changes --no-restore
+
+      - name: Build
+        run: dotnet build --no-restore --configuration Release
+
+      - name: Test with coverage
+        run: |
+          dotnet test --no-build --configuration Release \
+            --settings build/coverlet.runsettings \
+            --collect:"XPlat Code Coverage" \
+            --results-directory ./TestResults \
+            --logger "trx;LogFileName=test-results.trx"
+
+      - name: Install ReportGenerator
+        run: dotnet tool install --global dotnet-reportgenerator-globaltool
+
+      - name: Generate coverage report + enforce gate
+        run: |
+          reportgenerator \
+            -reports:'./TestResults/**/coverage.cobertura.xml' \
+            -targetdir:'./TestResults/coverage-report' \
+            -reporttypes:'Html;TextSummary;MarkdownSummaryGithub' \
+            -assemblyfilters:'+Vidarr.*;-*Tests*' \
+            -classfilters:'-*Migrations*;-*Program' \
+            -filefilters:'-**/Migrations/**;-**/Program.cs'
+
+          LINE_COVERAGE=$(grep -oP 'Line coverage: \K[0-9.]+' ./TestResults/coverage-report/Summary.txt | head -1)
+          echo "Line coverage: ${LINE_COVERAGE}%"
+          echo "## Coverage" >> "$GITHUB_STEP_SUMMARY"
+          cat ./TestResults/coverage-report/SummaryGithub.md >> "$GITHUB_STEP_SUMMARY"
+          THRESHOLD=95
+          awk -v c="$LINE_COVERAGE" -v t="$THRESHOLD" 'BEGIN{ if (c+0 < t+0) { printf "FAIL: %s%% < %s%%\n", c, t; exit 1 } else { printf "PASS: %s%% >= %s%%\n", c, t } }'
+
+      - name: Upload coverage HTML
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: coverage-report
+          path: ./TestResults/coverage-report
+
+      - name: Upload test results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: test-results
+          path: ./TestResults/**/*.trx
