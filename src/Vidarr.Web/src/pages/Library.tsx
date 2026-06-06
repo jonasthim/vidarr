@@ -1,15 +1,24 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { api } from "../api";
 
 export function LibraryPage(): JSX.Element {
   const [selectedArtistId, setSelectedArtistId] = useState<number | null>(null);
+  const [channelsDraft, setChannelsDraft] = useState<string>("");
   const queryClient = useQueryClient();
 
   const artists = useQuery({
     queryKey: ["artists"],
     queryFn: api.listArtists,
   });
+
+  const selectedArtist = artists.data?.find((a) => a.id === selectedArtistId);
+
+  useEffect(() => {
+    if (selectedArtist) {
+      setChannelsDraft(selectedArtist.youTubeChannelIds.join(", "));
+    }
+  }, [selectedArtist]);
 
   const videos = useQuery({
     queryKey: ["videos", selectedArtistId],
@@ -20,6 +29,12 @@ export function LibraryPage(): JSX.Element {
   const search = useMutation({
     mutationFn: (artistId: number) => api.triggerArtistSearch(artistId),
     onSuccess: () => queryClient.invalidateQueries({ queryKey: ["queue"] }),
+  });
+
+  const saveChannels = useMutation({
+    mutationFn: ({ id, channels }: { id: number; channels: string[] }) =>
+      api.updateYouTubeChannels(id, channels),
+    onSuccess: () => queryClient.invalidateQueries({ queryKey: ["artists"] }),
   });
 
   return (
@@ -58,6 +73,32 @@ export function LibraryPage(): JSX.Element {
                 Search now
               </button>
             </header>
+
+            <section className="youtube-channels">
+              <label>
+                YouTube channels (comma-separated UC… IDs)
+                <input
+                  value={channelsDraft}
+                  onChange={(e) => setChannelsDraft(e.target.value)}
+                  placeholder="UCabc, UCdef"
+                />
+              </label>
+              <button
+                type="button"
+                disabled={saveChannels.isPending}
+                onClick={() =>
+                  saveChannels.mutate({
+                    id: selectedArtistId,
+                    channels: channelsDraft
+                      .split(",")
+                      .map((c) => c.trim())
+                      .filter(Boolean),
+                  })
+                }
+              >
+                Save channels
+              </button>
+            </section>
             <ul>
               {videos.data?.map((v) => (
                 <li key={v.id}>

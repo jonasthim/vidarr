@@ -76,6 +76,21 @@ public static class Endpoints
             return artist is null ? Results.NotFound() : Results.Ok(ToDto(artist));
         });
 
+        v1.MapPut("/artist/{id:int}/youtube-channels", async (
+            int id, YouTubeChannelsRequest req, IArtistRepository artists, CancellationToken ct) =>
+        {
+            var artist = await artists.GetAsync(id, ct);
+            if (artist is null) return Results.NotFound();
+            var cleaned = req.ChannelIds
+                .Select(c => c?.Trim() ?? string.Empty)
+                .Where(c => !string.IsNullOrEmpty(c))
+                .Distinct(StringComparer.Ordinal)
+                .ToArray();
+            artist.YouTubeChannelIdsJson = System.Text.Json.JsonSerializer.Serialize(cleaned);
+            await artists.UpdateAsync(artist, ct);
+            return Results.Ok(ToDto(artist));
+        });
+
         v1.MapGet("/musicvideo", async (int? artistId, IMusicVideoRepository videos, CancellationToken ct) =>
         {
             if (artistId is null)
@@ -157,7 +172,19 @@ public static class Endpoints
     }
 
     internal static ArtistDto ToDto(Artist a) =>
-        new(a.Id, a.Name, a.SortName, a.Country, a.Monitored, a.MonitorMode, a.RootFolderPath, a.Added);
+        new(a.Id, a.Name, a.SortName, a.Country, a.Monitored, a.MonitorMode, a.RootFolderPath, a.Added, ParseChannelIds(a.YouTubeChannelIdsJson));
+
+    private static string[] ParseChannelIds(string json)
+    {
+        try
+        {
+            return System.Text.Json.JsonSerializer.Deserialize<string[]>(json) ?? [];
+        }
+        catch (System.Text.Json.JsonException)
+        {
+            return [];
+        }
+    }
 
     internal static MusicVideoDto ToDto(MusicVideo v) =>
         new(v.Id, v.ArtistId, v.Title, v.Year, v.Type, v.Monitored, v.HasFile);

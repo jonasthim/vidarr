@@ -5,6 +5,11 @@ using Vidarr.Contracts.Models;
 
 namespace Vidarr.DownloadClients;
 
+internal static class FactoryJsonOptions
+{
+    public static readonly JsonSerializerOptions Default = new() { PropertyNameCaseInsensitive = true };
+}
+
 public interface IDownloadClientFactory
 {
     string Implementation { get; }
@@ -35,7 +40,7 @@ public sealed class QBittorrentFactory : IDownloadClientFactory
 
     public IDownloadClient Create(int id, string name, string settingsJson)
     {
-        var raw = JsonSerializer.Deserialize<RawSettings>(settingsJson) ?? new RawSettings();
+        var raw = JsonSerializer.Deserialize<RawSettings>(settingsJson, FactoryJsonOptions.Default) ?? new RawSettings();
         return new QBittorrentDownloadClient(id, name,
             new QBittorrentSettings(
                 BaseUrl: new Uri(string.IsNullOrWhiteSpace(raw.BaseUrl) ? "http://localhost:8080" : raw.BaseUrl, UriKind.Absolute),
@@ -73,7 +78,7 @@ public sealed class TransmissionFactory : IDownloadClientFactory
 
     public IDownloadClient Create(int id, string name, string settingsJson)
     {
-        var raw = JsonSerializer.Deserialize<RawSettings>(settingsJson) ?? new RawSettings();
+        var raw = JsonSerializer.Deserialize<RawSettings>(settingsJson, FactoryJsonOptions.Default) ?? new RawSettings();
         return new TransmissionDownloadClient(id, name,
             new TransmissionSettings(
                 BaseUrl: new Uri(string.IsNullOrWhiteSpace(raw.BaseUrl) ? "http://localhost:9091" : raw.BaseUrl, UriKind.Absolute),
@@ -111,7 +116,7 @@ public sealed class DelugeFactory : IDownloadClientFactory
 
     public IDownloadClient Create(int id, string name, string settingsJson)
     {
-        var raw = JsonSerializer.Deserialize<RawSettings>(settingsJson) ?? new RawSettings();
+        var raw = JsonSerializer.Deserialize<RawSettings>(settingsJson, FactoryJsonOptions.Default) ?? new RawSettings();
         return new DelugeDownloadClient(id, name,
             new DelugeSettings(
                 BaseUrl: new Uri(string.IsNullOrWhiteSpace(raw.BaseUrl) ? "http://localhost:8112" : raw.BaseUrl, UriKind.Absolute),
@@ -149,7 +154,7 @@ public sealed class SABnzbdFactory : IDownloadClientFactory
 
     public IDownloadClient Create(int id, string name, string settingsJson)
     {
-        var raw = JsonSerializer.Deserialize<RawSettings>(settingsJson) ?? new RawSettings();
+        var raw = JsonSerializer.Deserialize<RawSettings>(settingsJson, FactoryJsonOptions.Default) ?? new RawSettings();
         return new SABnzbdDownloadClient(id, name,
             new SABnzbdSettings(
                 BaseUrl: new Uri(string.IsNullOrWhiteSpace(raw.BaseUrl) ? "http://localhost:8080" : raw.BaseUrl, UriKind.Absolute),
@@ -188,7 +193,7 @@ public sealed class NZBGetFactory : IDownloadClientFactory
 
     public IDownloadClient Create(int id, string name, string settingsJson)
     {
-        var raw = JsonSerializer.Deserialize<RawSettings>(settingsJson) ?? new RawSettings();
+        var raw = JsonSerializer.Deserialize<RawSettings>(settingsJson, FactoryJsonOptions.Default) ?? new RawSettings();
         return new NZBGetDownloadClient(id, name,
             new NZBGetSettings(
                 BaseUrl: new Uri(string.IsNullOrWhiteSpace(raw.BaseUrl) ? "http://localhost:6789" : raw.BaseUrl, UriKind.Absolute),
@@ -232,7 +237,7 @@ public sealed class YtDlpFactory : IDownloadClientFactory
 
     public IDownloadClient Create(int id, string name, string settingsJson)
     {
-        var raw = JsonSerializer.Deserialize<RawSettings>(settingsJson) ?? new RawSettings();
+        var raw = JsonSerializer.Deserialize<RawSettings>(settingsJson, FactoryJsonOptions.Default) ?? new RawSettings();
         var settings = new YtDlpDownloadClientSettings(
             IncompleteFolder: raw.IncompleteFolder ?? "/tmp/vidarr-incomplete",
             FormatSelector: raw.FormatSelector ?? "bv*+ba/b",

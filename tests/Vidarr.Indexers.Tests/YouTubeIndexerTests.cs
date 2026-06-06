@@ -11,7 +11,11 @@ public class YouTubeIndexerTests
     private const string SampleEntry2 = """{"id":"def456","title":"Around the World (Live)","webpage_url":"https://www.youtube.com/watch?v=def456","uploader":"random_user","upload_date":"20100101","height":720}""";
 
     private static YouTubeIndexer Build(FakeProcessRunner runner, YouTubeIndexerSettings? settings = null) =>
-        new(1, "YouTube", settings ?? YouTubeIndexerSettings.Default, runner);
+        new(1, "YouTube",
+            settings ?? YouTubeIndexerSettings.Default,
+            runner,
+            new FakeHttpClient(),
+            new YouTubeQualityMapper());
 
     [Fact]
     public async Task Fetch_parses_yt_dlp_dump_json_lines()
@@ -79,20 +83,47 @@ public class YouTubeIndexerTests
     }
 
     [Fact]
-    public async Task RssSync_invokes_yt_dlp_per_channel()
+    public async Task RssSync_uses_http_atom_feed_per_channel()
     {
-        var runner = new FakeProcessRunner()
-            .WhenInvocation(inv => inv.Arguments.Any(a => a.Contains("UCabc", StringComparison.Ordinal)),
-                new ProcessResult(0, SampleEntry1, "", TimeSpan.Zero))
-            .WhenInvocation(inv => inv.Arguments.Any(a => a.Contains("UCdef", StringComparison.Ordinal)),
-                new ProcessResult(0, SampleEntry2, "", TimeSpan.Zero));
+        // Phase 6: channel RSS now hits the official feed URL directly instead of
+        // shelling out to yt-dlp. The runner should NOT be touched at all.
+        var runner = new FakeProcessRunner();
+        var http = new FakeHttpClient();
+        http.WhenRequest(r => r.Uri.Query.Contains("UCabc", StringComparison.Ordinal),
+            HttpClientResponseFactory.Xml(SampleAtomFeed("UCabc", "Channel A")));
+        http.WhenRequest(r => r.Uri.Query.Contains("UCdef", StringComparison.Ordinal),
+            HttpClientResponseFactory.Xml(SampleAtomFeed("UCdef", "Channel B")));
 
         var settings = YouTubeIndexerSettings.Default with { ChannelIds = ["UCabc", "UCdef"] };
-        var releases = await Build(runner, settings).RssSyncAsync(default);
+        var indexer = new YouTubeIndexer(1, "YouTube", settings, runner, http, new YouTubeQualityMapper());
+        var releases = await indexer.RssSyncAsync(default);
 
-        runner.Invocations.Should().HaveCount(2);
+        runner.Invocations.Should().BeEmpty();
+        http.Requests.Should().HaveCount(2);
+        http.Requests.All(r => r.Uri.AbsolutePath.EndsWith("/feeds/videos.xml", StringComparison.Ordinal)).Should().BeTrue();
         releases.Should().HaveCount(2);
+        releases.Should().Contain(r => r.ExtraMetadata.GetValueOrDefault("channelId") == "UCabc");
+        releases.Should().Contain(r => r.ExtraMetadata.GetValueOrDefault("channelId") == "UCdef");
     }
+
+    private static string SampleAtomFeed(string channelId, string channelTitle) => $"""
+    <?xml version="1.0" encoding="UTF-8"?>
+    <feed xmlns:yt="http://www.youtube.com/xml/schemas/2015"
+          xmlns:media="http://search.yahoo.com/mrss/"
+          xmlns="http://www.w3.org/2005/Atom">
+      <yt:channelId>{channelId}</yt:channelId>
+      <title>{channelTitle}</title>
+      <entry>
+        <yt:videoId>video-from-{channelId}</yt:videoId>
+        <title>Daft Punk - Around the World ({channelTitle})</title>
+        <author><name>{channelTitle}</name></author>
+        <published>2025-10-17T12:00:00+00:00</published>
+        <media:group>
+          <media:content url="https://www.youtube.com/v/x" height="1080"/>
+        </media:group>
+      </entry>
+    </feed>
+    """;
 
     [Fact]
     public async Task Test_returns_success_when_yt_dlp_reports_version()

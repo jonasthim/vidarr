@@ -4,6 +4,11 @@ using Vidarr.Contracts.Domain;
 
 namespace Vidarr.Indexers;
 
+internal static class IndexerJsonOptions
+{
+    public static readonly JsonSerializerOptions Default = new() { PropertyNameCaseInsensitive = true };
+}
+
 public interface IIndexerFactory
 {
     string Implementation { get; }
@@ -38,7 +43,7 @@ public sealed class NewznabIndexerFactory : IIndexerFactory
 
     internal static NewznabIndexerSettings ParseSettings(string json)
     {
-        var raw = JsonSerializer.Deserialize<RawNewznabSettings>(json) ?? new RawNewznabSettings();
+        var raw = JsonSerializer.Deserialize<RawNewznabSettings>(json, IndexerJsonOptions.Default) ?? new RawNewznabSettings();
         return new NewznabIndexerSettings(
             BaseUrl: new Uri(string.IsNullOrWhiteSpace(raw.BaseUrl) ? "https://example.invalid" : raw.BaseUrl, UriKind.Absolute),
             ApiKey: raw.ApiKey,
@@ -80,13 +85,21 @@ public sealed class TorznabIndexerFactory : IIndexerFactory
 public sealed class YouTubeIndexerFactory : IIndexerFactory
 {
     private readonly IProcessRunner _processes;
-    public YouTubeIndexerFactory(IProcessRunner processes) { _processes = processes; }
+    private readonly IHttpClient _http;
+    private readonly IYouTubeQualityMapper _qualityMapper;
+    public YouTubeIndexerFactory(IProcessRunner processes, IHttpClient http, IYouTubeQualityMapper qualityMapper)
+    {
+        _processes = processes;
+        _http = http;
+        _qualityMapper = qualityMapper;
+    }
 
     public string Implementation => "YouTube";
-    public string DisplayName => "YouTube (yt-dlp)";
+    public string DisplayName => "YouTube (Data API + yt-dlp)";
 
     public IReadOnlyList<IndexerFieldSchema> SettingsSchema { get; } =
     [
+        new("dataApiKey", "YouTube Data API v3 key", "password", false, "Optional. When set, search hits the official API and falls back to yt-dlp on quotaExceeded."),
         new("channelIds", "Monitored channel IDs (comma-separated UC...)", "text", false, "Used for RSS sync"),
         new("maxResults", "Max results per search", "number", false, "Default 10"),
         new("rssBatchSize", "RSS batch size per channel", "number", false, "Default 15"),
@@ -94,14 +107,15 @@ public sealed class YouTubeIndexerFactory : IIndexerFactory
 
     public IIndexer Create(int id, string name, string settingsJson)
     {
-        var raw = JsonSerializer.Deserialize<RawYoutubeSettings>(settingsJson) ?? new RawYoutubeSettings();
+        var raw = JsonSerializer.Deserialize<RawYoutubeSettings>(settingsJson, IndexerJsonOptions.Default) ?? new RawYoutubeSettings();
         var settings = YouTubeIndexerSettings.Default with
         {
             ChannelIds = raw.ChannelIds ?? [],
             MaxResults = raw.MaxResults ?? 10,
             RssBatchSize = raw.RssBatchSize ?? 15,
+            DataApiKey = string.IsNullOrEmpty(raw.DataApiKey) ? null : raw.DataApiKey,
         };
-        return new YouTubeIndexer(id, name, settings, _processes);
+        return new YouTubeIndexer(id, name, settings, _processes, _http, _qualityMapper);
     }
 
     private sealed class RawYoutubeSettings
@@ -109,5 +123,6 @@ public sealed class YouTubeIndexerFactory : IIndexerFactory
         public List<string>? ChannelIds { get; set; }
         public int? MaxResults { get; set; }
         public int? RssBatchSize { get; set; }
+        public string? DataApiKey { get; set; }
     }
 }

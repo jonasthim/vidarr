@@ -17,6 +17,7 @@ export type ArtistDto = {
   monitorMode: string;
   rootFolderPath: string;
   added: string;
+  youTubeChannelIds: string[];
 };
 
 export type MusicVideoDto = {
@@ -200,6 +201,12 @@ export const api = {
     call<IndexerTestResult>("/indexer/test", {
       method: "POST",
       body: JSON.stringify({ implementation, settingsJson }),
+    }),
+
+  updateYouTubeChannels: (artistId: number, channelIds: string[]) =>
+    call<ArtistDto>(`/artist/${artistId}/youtube-channels`, {
+      method: "PUT",
+      body: JSON.stringify({ channelIds }),
     }),
 
   // search

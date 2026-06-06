@@ -48,9 +48,14 @@ builder.Services.AddSingleton<IReleaseParser, ReleaseParser>();
 builder.Services.AddSingleton<INamingService, NamingService>();
 builder.Services.AddSingleton<IImporterService, ImporterService>();
 
+builder.Services.AddSingleton<IYouTubeQualityMapper, YouTubeQualityMapper>();
 builder.Services.AddSingleton(new YouTubeIndexerSettings(ChannelIds: [], MaxResults: 10, RssBatchSize: 15, Timeout: TimeSpan.FromMinutes(2)));
 builder.Services.AddSingleton<IIndexer>(sp => new YouTubeIndexer(
-    1, "YouTube", sp.GetRequiredService<YouTubeIndexerSettings>(), sp.GetRequiredService<IProcessRunner>()));
+    1, "YouTube",
+    sp.GetRequiredService<YouTubeIndexerSettings>(),
+    sp.GetRequiredService<IProcessRunner>(),
+    sp.GetRequiredService<IHttpClient>(),
+    sp.GetRequiredService<IYouTubeQualityMapper>()));
 
 // Indexer factories — Phase 3 plug-in registry used by REST /indexer/schema + /indexer/test.
 builder.Services.AddSingleton<IIndexerFactory, NewznabIndexerFactory>();
