@@ -55,6 +55,44 @@ public static class ReleaseEndpoints
                 IndexersQueried: result.IndexersQueried));
         });
 
+        // Manual grab: caller picked a specific release from the interactive search; we hand
+        // it off to the default IDownloadClient (Phase 4 multi-client routing lands in P10).
+        v1.MapPost("/release/grab", async (
+            ReleaseGrabRequest req,
+            Vidarr.Contracts.Domain.IDownloadClient downloadClient,
+            Vidarr.Decision.IReleaseParser parser,
+            CancellationToken ct) =>
+        {
+            if (string.IsNullOrWhiteSpace(req.Title) || string.IsNullOrWhiteSpace(req.SourceUrl))
+            {
+                return Results.BadRequest(new ApiErrorResponse([new ApiError("title", "Title and sourceUrl are required")]));
+            }
+            if (!Uri.TryCreate(req.SourceUrl, UriKind.Absolute, out var source))
+            {
+                return Results.BadRequest(new ApiErrorResponse([new ApiError("sourceUrl", "sourceUrl must be an absolute URI")]));
+            }
+
+            var info = new Vidarr.Contracts.Models.ReleaseInfo(
+                Title: req.Title,
+                SourceUrl: source,
+                Magnet: req.Magnet,
+                SizeBytes: req.SizeBytes,
+                PublishedAt: req.PublishedAt,
+                Age: req.PublishedAt is { } at ? DateTimeOffset.UtcNow - at : null,
+                Seeders: req.Seeders,
+                Leechers: req.Leechers,
+                Protocol: Enum.TryParse<Vidarr.Contracts.Models.DownloadProtocol>(req.Protocol, true, out var p) ? p : Vidarr.Contracts.Models.DownloadProtocol.Unknown,
+                IndexerName: req.IndexerName ?? "manual",
+                IndexerCategory: req.IndexerCategory,
+                ExtraMetadata: req.ExtraMetadata ?? new Dictionary<string, string>());
+            var parsed = parser.Parse(req.Title);
+            var remote = new Vidarr.Contracts.Models.RemoteRelease(info, parsed, 0,
+                RejectionReasons: [], MatchedMusicVideoIds: req.MusicVideoIds ?? []);
+
+            var id = await downloadClient.DownloadAsync(remote, ct);
+            return Results.Accepted(value: new ReleaseGrabResponse(id.Value, info.Title));
+        });
+
         v1.MapGet("/indexer/schema", (IEnumerable<IIndexerFactory> factories) =>
             Results.Ok(factories.Select(f => new IndexerSchemaDto(
                 Implementation: f.Implementation,
@@ -132,3 +170,21 @@ public sealed record IndexerTestRequest(string Implementation, string? SettingsJ
 
 [ExcludeFromCodeCoverage(Justification = "Plain transport DTOs.")]
 public sealed record IndexerTestResultDto(bool Success, string? Message);
+
+[ExcludeFromCodeCoverage(Justification = "Plain transport DTOs.")]
+public sealed record ReleaseGrabRequest(
+    string Title,
+    string SourceUrl,
+    string? Magnet,
+    long? SizeBytes,
+    DateTimeOffset? PublishedAt,
+    int? Seeders,
+    int? Leechers,
+    string? Protocol,
+    string? IndexerName,
+    string? IndexerCategory,
+    IReadOnlyList<int>? MusicVideoIds,
+    Dictionary<string, string>? ExtraMetadata);
+
+[ExcludeFromCodeCoverage(Justification = "Plain transport DTOs.")]
+public sealed record ReleaseGrabResponse(string DownloadId, string Title);

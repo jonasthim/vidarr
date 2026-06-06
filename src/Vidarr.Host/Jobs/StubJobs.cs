@@ -19,18 +19,30 @@ public sealed class WantedVideoSearchJob : IRecurringJob
     }
 }
 
-/// <summary>Stubbed in P7; the discovery-rule engine lands in Phase 9.</summary>
-[ExcludeFromCodeCoverage(Justification = "Stub job — engine in Phase 9.")]
+/// <summary>Nightly evaluation of <see cref="Vidarr.Rules.IDiscoveryRuleEngine"/>.</summary>
+[ExcludeFromCodeCoverage(Justification = "Composition job; integration-tested via the runner.")]
 public sealed class RuleSetEvaluationJob : IRecurringJob
 {
+    private readonly IServiceProvider _services;
     private readonly ILogger<RuleSetEvaluationJob> _logger;
-    public RuleSetEvaluationJob(ILogger<RuleSetEvaluationJob> logger) { _logger = logger; }
+    public RuleSetEvaluationJob(IServiceProvider services, ILogger<RuleSetEvaluationJob> logger)
+    {
+        _services = services;
+        _logger = logger;
+    }
     public string Name => "RuleSetEvaluation";
     public TimeSpan Interval => TimeSpan.FromDays(1);
-    public Task RunAsync(CancellationToken ct)
+
+    public async Task RunAsync(CancellationToken ct)
     {
-        _logger.LogInformation("RuleSetEvaluation: deferred to Phase 9 (engine not yet wired)");
-        return Task.CompletedTask;
+        using var scope = _services.CreateScope();
+        var engine = scope.ServiceProvider.GetRequiredService<Vidarr.Rules.IDiscoveryRuleEngine>();
+        var results = await engine.EvaluateAllAsync(ct);
+        foreach (var r in results)
+        {
+            _logger.LogInformation("RuleSetEvaluation {Rule}: matched={Matched}, monitored={Monitored}",
+                r.RuleName, r.Matched, r.VideosMonitored);
+        }
     }
 }
 

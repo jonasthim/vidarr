@@ -118,6 +118,32 @@ public static class Endpoints
             return Results.Accepted(value: new CommandResponse("queued", cmd.Name));
         });
 
+        // Remove a queue item. When ?blocklist=true the release title is added to the
+        // blocklist so future Decision passes will reject it.
+        v1.MapDelete("/queue/{id}", async (
+            string id,
+            IDownloadClient client,
+            [Microsoft.AspNetCore.Mvc.FromServices] IBlocklistRepository blocklist,
+            [Microsoft.AspNetCore.Mvc.FromQuery(Name = "blocklist")] bool? addToBlocklist,
+            CancellationToken ct) =>
+        {
+            var items = await client.GetItemsAsync(ct);
+            var item = items.FirstOrDefault(i => string.Equals(i.Id.Value, id, StringComparison.Ordinal));
+            var shouldBlocklist = addToBlocklist == true;
+            await client.RemoveAsync(new DownloadClientItemId(id), deleteData: shouldBlocklist, ct);
+            if (shouldBlocklist && item is not null && !string.IsNullOrEmpty(item.Title))
+            {
+                await blocklist.AddAsync(new Vidarr.Catalog.Entities.BlocklistEntry
+                {
+                    ReleaseTitle = item.Title,
+                    IndexerName = "manual",
+                    Reason = "manual-blocklist",
+                    Date = DateTimeOffset.UtcNow,
+                }, ct);
+            }
+            return Results.NoContent();
+        });
+
         v1.MapGet("/queue", async (
             IDownloadClient client,
             [Microsoft.AspNetCore.Mvc.FromServices] Vidarr.DownloadClients.IDownloadClientRegistry? registry,

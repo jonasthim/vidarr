@@ -18,6 +18,7 @@
     <ProjectReference Include="..\Vidarr.Metadata\Vidarr.Metadata.csproj" />
     <ProjectReference Include="..\Vidarr.Naming\Vidarr.Naming.csproj" />
     <ProjectReference Include="..\Vidarr.Notifications\Vidarr.Notifications.csproj" />
+    <ProjectReference Include="..\Vidarr.Rules\Vidarr.Rules.csproj" />
     <ProjectReference Include="..\Vidarr.Scheduler\Vidarr.Scheduler.csproj" />
   </ItemGroup>
 

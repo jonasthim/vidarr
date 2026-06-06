@@ -6,8 +6,19 @@ import { GeneralSettingsPanel } from "../components/GeneralSettingsPanel";
 import { IndexersPanel } from "../components/IndexersPanel";
 import { DownloadClientsPanel } from "../components/DownloadClientsPanel";
 import { CustomFormatsPanel } from "../components/CustomFormatsPanel";
+import { BlocklistPanel } from "../components/BlocklistPanel";
+import { DiscoveryRulesPanel } from "../components/DiscoveryRulesPanel";
 
-type Pane = "general" | "profiles" | "customformats" | "rootfolders" | "tags" | "indexers" | "downloadclients";
+type Pane =
+  | "general"
+  | "profiles"
+  | "customformats"
+  | "rootfolders"
+  | "tags"
+  | "indexers"
+  | "downloadclients"
+  | "blocklist"
+  | "discoveryrules";
 
 export function SettingsPage(): JSX.Element {
   const [pane, setPane] = useState<Pane>("general");
@@ -23,8 +34,10 @@ export function SettingsPage(): JSX.Element {
               ["customformats", "Custom Formats"],
               ["indexers", "Indexers"],
               ["downloadclients", "Download Clients"],
+              ["discoveryrules", "Discovery Rules"],
               ["rootfolders", "Root Folders"],
               ["tags", "Tags"],
+              ["blocklist", "Blocklist"],
             ] as const
           ).map(([key, label]) => (
             <li
@@ -48,8 +61,10 @@ export function SettingsPage(): JSX.Element {
         {pane === "customformats" && <CustomFormatsPanel />}
         {pane === "indexers" && <IndexersPanel />}
         {pane === "downloadclients" && <DownloadClientsPanel />}
+        {pane === "discoveryrules" && <DiscoveryRulesPanel />}
         {pane === "rootfolders" && <RootFoldersPanel />}
         {pane === "tags" && <TagsPanel />}
+        {pane === "blocklist" && <BlocklistPanel />}
       </div>
     </section>
   );

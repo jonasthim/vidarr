@@ -86,6 +86,9 @@ builder.Services.AddHostedService<CommandWorker>();
 
 builder.Services.AddScoped<ICommandHandler<ArtistSearchCommand>, ArtistSearchCommandHandler>();
 
+// Phase 9 — Discovery rules engine.
+builder.Services.AddScoped<Vidarr.Rules.IDiscoveryRuleEngine, Vidarr.Rules.DiscoveryRuleEngine>();
+
 // Phase 7 — Recurring jobs + history.
 builder.Services.AddSingleton<IJobRunHistory, InMemoryJobRunHistory>();
 builder.Services.AddSingleton<IRecurringJobRunner, RecurringJobRunner>();
@@ -114,6 +117,7 @@ app.MapVidarrSettingsApi();
 app.MapVidarrReleaseApi();
 app.MapVidarrDownloadClientApi();
 app.MapVidarrSystemCommandApi();
+app.MapVidarrDiscoveryRuleApi();
 
 var wwwroot = Path.Combine(builder.Environment.ContentRootPath, "wwwroot");
 if (Directory.Exists(wwwroot))

@@ -45,6 +45,8 @@ public class ReleaseEndpointsTests : IDisposable
                 s.AddSingleton<IReleaseSearchService>(_search);
                 s.AddSingleton<IIndexerFactory>(new StubIndexerFactory("Newznab", true));
                 s.AddSingleton<IIndexerFactory>(new StubIndexerFactory("Torznab", false));
+                s.AddSingleton<Vidarr.Decision.IReleaseParser, Vidarr.Decision.ReleaseParser>();
+                s.AddSingleton<IDownloadClient>(new StubGrabDownloadClient());
             });
             web.Configure(app =>
             {
@@ -147,6 +149,20 @@ public class ReleaseEndpointsTests : IDisposable
         resp.StatusCode.Should().Be(HttpStatusCode.OK);
         var result = await resp.Content.ReadFromJsonAsync<IndexerTestResultDto>();
         result!.Success.Should().BeFalse();
+    }
+
+    private sealed class StubGrabDownloadClient : IDownloadClient
+    {
+        public int Id => 1;
+        public string Name => "stub-dc";
+        public DownloadProtocol Protocol => DownloadProtocol.Streaming;
+        public Task<DownloadClientItemId> DownloadAsync(RemoteRelease release, CancellationToken ct) =>
+            Task.FromResult(new DownloadClientItemId("grabbed-" + release.Info.Title));
+        public Task<IReadOnlyList<DownloadClientItem>> GetItemsAsync(CancellationToken ct) =>
+            Task.FromResult<IReadOnlyList<DownloadClientItem>>([]);
+        public Task RemoveAsync(DownloadClientItemId id, bool deleteData, CancellationToken ct) => Task.CompletedTask;
+        public Task<DownloadClientTestResult> TestAsync(CancellationToken ct) =>
+            Task.FromResult(new DownloadClientTestResult(true, null));
     }
 
     private sealed class StubReleaseSearchService : IReleaseSearchService

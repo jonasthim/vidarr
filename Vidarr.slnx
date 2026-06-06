@@ -13,6 +13,7 @@
     <Project Path="src/Vidarr.Metadata/Vidarr.Metadata.csproj" />
     <Project Path="src/Vidarr.Naming/Vidarr.Naming.csproj" />
     <Project Path="src/Vidarr.Notifications/Vidarr.Notifications.csproj" />
+    <Project Path="src/Vidarr.Rules/Vidarr.Rules.csproj" />
     <Project Path="src/Vidarr.Scheduler/Vidarr.Scheduler.csproj" />
   </Folder>
   <Folder Name="/tests/">
@@ -27,6 +28,7 @@
     <Project Path="tests/Vidarr.Metadata.Tests/Vidarr.Metadata.Tests.csproj" />
     <Project Path="tests/Vidarr.Naming.Tests/Vidarr.Naming.Tests.csproj" />
     <Project Path="tests/Vidarr.Notifications.Tests/Vidarr.Notifications.Tests.csproj" />
+    <Project Path="tests/Vidarr.Rules.Tests/Vidarr.Rules.Tests.csproj" />
     <Project Path="tests/Vidarr.Scheduler.Tests/Vidarr.Scheduler.Tests.csproj" />
     <Project Path="tests/Vidarr.Tests.Common/Vidarr.Tests.Common.csproj" />
   </Folder>

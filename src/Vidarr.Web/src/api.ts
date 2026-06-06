@@ -81,6 +81,47 @@ export type CustomFormat = {
   specificationsJson: string;
 };
 
+export type BlocklistEntry = {
+  id: number;
+  artistId?: number;
+  musicVideoId?: number;
+  releaseTitle: string;
+  indexerName: string;
+  reason?: string;
+  date: string;
+};
+
+export type DiscoveryRule = {
+  id: number;
+  name: string;
+  enabled: boolean;
+  conditionsJson: string;
+  actionJson: string;
+  lastRun?: string;
+};
+
+export type DiscoveryEvaluationDto = {
+  ruleId: number;
+  ruleName: string;
+  matched: number;
+  videosMonitored: number;
+};
+
+export type ReleaseGrab = {
+  title: string;
+  sourceUrl: string;
+  magnet?: string;
+  sizeBytes?: number;
+  publishedAt?: string;
+  seeders?: number;
+  leechers?: number;
+  protocol?: string;
+  indexerName?: string;
+  indexerCategory?: string;
+  musicVideoIds?: number[];
+  extraMetadata?: Record<string, string>;
+};
+
 export type CustomFormatSpec = {
   implementation: string;
   negate?: boolean;
@@ -171,6 +212,30 @@ export const api = {
     }),
   deleteQualityProfile: (id: number) =>
     call<unknown>(`/qualityprofile/${id}`, { method: "DELETE" }),
+
+  listBlocklist: () => call<BlocklistEntry[]>("/blocklist"),
+  addBlocklist: (body: { releaseTitle: string; indexerName?: string; reason?: string }) =>
+    call<BlocklistEntry>("/blocklist", { method: "POST", body: JSON.stringify(body) }),
+  deleteBlocklist: (id: number) =>
+    call<unknown>(`/blocklist/${id}`, { method: "DELETE" }),
+  removeQueueItem: (id: string, blocklist: boolean) =>
+    call<unknown>(`/queue/${encodeURIComponent(id)}?blocklist=${blocklist}`, { method: "DELETE" }),
+
+  listDiscoveryRules: () => call<DiscoveryRule[]>("/discoveryrule"),
+  createDiscoveryRule: (body: Omit<DiscoveryRule, "id" | "lastRun">) =>
+    call<DiscoveryRule>("/discoveryrule", { method: "POST", body: JSON.stringify(body) }),
+  deleteDiscoveryRule: (id: number) =>
+    call<unknown>(`/discoveryrule/${id}`, { method: "DELETE" }),
+  evaluateDiscoveryRule: (id: number) =>
+    call<DiscoveryEvaluationDto>(`/discoveryrule/evaluate/${id}`, { method: "POST" }),
+  evaluateAllDiscoveryRules: () =>
+    call<DiscoveryEvaluationDto[]>("/discoveryrule/evaluate-all", { method: "POST" }),
+
+  grabRelease: (body: ReleaseGrab) =>
+    call<{ downloadId: string; title: string }>("/release/grab", {
+      method: "POST",
+      body: JSON.stringify(body),
+    }),
 
   listCustomFormats: () => call<CustomFormat[]>("/customformat"),
   createCustomFormat: (body: Omit<CustomFormat, "id">) =>
