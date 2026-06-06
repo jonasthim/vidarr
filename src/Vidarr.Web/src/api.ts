@@ -52,20 +52,71 @@ async function call<T>(path: string, init?: RequestInit): Promise<T> {
   return (await resp.json()) as T;
 }
 
+export type Quality = {
+  id: number;
+  name: string;
+  resolution: string;
+  source: string;
+};
+
+export type QualityProfile = {
+  id: number;
+  name: string;
+  allowedQualityIds: number[];
+  cutoffQualityId: number;
+  upgradeAllowed: boolean;
+  minFormatScore: number;
+  minSizeBytes?: number;
+  maxSizeBytes?: number;
+  tags: number[];
+};
+
+export type Tag = { id: number; label: string };
+
+export type RootFolder = {
+  id: number;
+  path: string;
+  accessible: boolean;
+  freeBytes: number;
+  totalBytes: number;
+};
+
+export type HostConfig = {
+  instanceName: string;
+  urlBase?: string;
+  logLevel: string;
+};
+
+export type NamingConfig = {
+  artistFolderTemplate: string;
+  fileTemplate: string;
+};
+
+export type MediaManagementConfig = {
+  fileOperation: string;
+  replaceIllegalCharacters: boolean;
+  illegalCharacterReplacement: string;
+};
+
 export const api = {
   lookupArtist: (query: string) =>
     call<ArtistLookupResult[]>("/artist/lookup", {
       method: "POST",
       body: JSON.stringify({ query }),
     }),
-  addArtist: (provider: string, providerId: string, rootFolderPath: string) =>
+  addArtist: (
+    provider: string,
+    providerId: string,
+    rootFolderPath: string,
+    qualityProfileId: number,
+  ) =>
     call<ArtistDto>("/artist", {
       method: "POST",
       body: JSON.stringify({
         provider,
         providerId,
         rootFolderPath,
-        qualityProfileId: 1,
+        qualityProfileId,
         monitorMode: "All",
       }),
     }),
@@ -78,4 +129,55 @@ export const api = {
       body: JSON.stringify({ name: "ArtistSearch", artistId }),
     }),
   listQueue: () => call<QueueItem[]>("/queue"),
+
+  // settings
+  listQualityDefinitions: () => call<Quality[]>("/qualitydefinition"),
+  listQualityProfiles: () => call<QualityProfile[]>("/qualityprofile"),
+  createQualityProfile: (body: Omit<QualityProfile, "id">) =>
+    call<QualityProfile>("/qualityprofile", {
+      method: "POST",
+      body: JSON.stringify(body),
+    }),
+  updateQualityProfile: (id: number, body: Omit<QualityProfile, "id">) =>
+    call<QualityProfile>(`/qualityprofile/${id}`, {
+      method: "PUT",
+      body: JSON.stringify(body),
+    }),
+  deleteQualityProfile: (id: number) =>
+    call<unknown>(`/qualityprofile/${id}`, { method: "DELETE" }),
+
+  listTags: () => call<Tag[]>("/tag"),
+  createTag: (label: string) =>
+    call<Tag>("/tag", { method: "POST", body: JSON.stringify({ label }) }),
+  deleteTag: (id: number) =>
+    call<unknown>(`/tag/${id}`, { method: "DELETE" }),
+
+  listRootFolders: () => call<RootFolder[]>("/rootfolder"),
+  createRootFolder: (path: string) =>
+    call<RootFolder>("/rootfolder", {
+      method: "POST",
+      body: JSON.stringify({ path }),
+    }),
+  deleteRootFolder: (id: number) =>
+    call<unknown>(`/rootfolder/${id}`, { method: "DELETE" }),
+
+  getHostConfig: () => call<HostConfig>("/config/host"),
+  putHostConfig: (body: HostConfig) =>
+    call<HostConfig>("/config/host", {
+      method: "PUT",
+      body: JSON.stringify(body),
+    }),
+  getNamingConfig: () => call<NamingConfig>("/config/naming"),
+  putNamingConfig: (body: NamingConfig) =>
+    call<NamingConfig>("/config/naming", {
+      method: "PUT",
+      body: JSON.stringify(body),
+    }),
+  getMediaManagementConfig: () =>
+    call<MediaManagementConfig>("/config/mediamanagement"),
+  putMediaManagementConfig: (body: MediaManagementConfig) =>
+    call<MediaManagementConfig>("/config/mediamanagement", {
+      method: "PUT",
+      body: JSON.stringify(body),
+    }),
 };

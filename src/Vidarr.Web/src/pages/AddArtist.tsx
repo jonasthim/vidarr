@@ -1,12 +1,18 @@
 import { useState } from "react";
-import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { api, type ArtistLookupResult } from "../api";
 
 export function AddArtistPage(): JSX.Element {
   const [query, setQuery] = useState("");
   const [results, setResults] = useState<ArtistLookupResult[]>([]);
   const [rootFolder, setRootFolder] = useState("/library");
+  const [profileId, setProfileId] = useState<number | null>(null);
   const queryClient = useQueryClient();
+
+  const profiles = useQuery({
+    queryKey: ["qualityProfiles"],
+    queryFn: api.listQualityProfiles,
+  });
 
   const lookupMutation = useMutation({
     mutationFn: (q: string) => api.lookupArtist(q),
@@ -15,7 +21,7 @@ export function AddArtistPage(): JSX.Element {
 
   const addMutation = useMutation({
     mutationFn: (providerId: string) =>
-      api.addArtist("imvdb", providerId, rootFolder),
+      api.addArtist("imvdb", providerId, rootFolder, profileId ?? profiles.data?.[0]?.id ?? 1),
     onSuccess: () => {
       void queryClient.invalidateQueries({ queryKey: ["artists"] });
       setResults([]);
@@ -38,6 +44,24 @@ export function AddArtistPage(): JSX.Element {
             value={rootFolder}
             onChange={(e) => setRootFolder(e.target.value)}
           />
+        </label>
+        <label>
+          Quality profile
+          <select
+            value={profileId ?? ""}
+            onChange={(e) =>
+              setProfileId(
+                e.target.value ? Number.parseInt(e.target.value, 10) : null,
+              )
+            }
+          >
+            <option value="">Default</option>
+            {profiles.data?.map((p) => (
+              <option key={p.id} value={p.id}>
+                {p.name}
+              </option>
+            ))}
+          </select>
         </label>
         <label>
           Search artist

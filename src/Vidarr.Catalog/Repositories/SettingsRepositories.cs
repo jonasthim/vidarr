@@ -356,7 +356,7 @@ public sealed class ApplicationConfigRepository(VidarrDbContext db) : IApplicati
 {
     public async Task<ApplicationConfig> GetAsync(CancellationToken ct)
     {
-        var existing = await db.ApplicationConfigs.FirstOrDefaultAsync(ct);
+        var existing = await db.ApplicationConfigs.OrderBy(c => c.Id).FirstOrDefaultAsync(ct);
         if (existing is not null)
         {
             return existing;

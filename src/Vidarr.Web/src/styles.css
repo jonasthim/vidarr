@@ -114,3 +114,54 @@ form button:disabled {
   border-radius: 6px;
   margin: 0.6rem 0;
 }
+
+.settings {
+  display: grid;
+  grid-template-columns: 240px 1fr;
+  gap: 1.5rem;
+}
+
+.settings-nav ul {
+  list-style: none;
+  padding: 0;
+}
+
+.settings-nav li {
+  padding: 0.55rem 0.7rem;
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+.settings-nav li.active {
+  background: #283041;
+}
+
+.settings-pane fieldset {
+  border: 1px solid #2a2f37;
+  border-radius: 6px;
+  padding: 0.6rem 0.9rem;
+  margin: 0.4rem 0 0.8rem;
+}
+
+.checkbox-row {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+}
+
+.profiles-list {
+  list-style: none;
+  padding: 0;
+}
+
+.profiles-list li {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  padding: 0.5rem 0;
+  border-bottom: 1px solid #2a2f37;
+}
+
+.muted {
+  color: #93a0b0;
+}
