@@ -11,6 +11,7 @@
   <ItemGroup>
     <ProjectReference Include="..\..\src\Vidarr.Api\Vidarr.Api.csproj" />
     <ProjectReference Include="..\..\src\Vidarr.Catalog\Vidarr.Catalog.csproj" />
+    <ProjectReference Include="..\..\src\Vidarr.DownloadClients\Vidarr.DownloadClients.csproj" />
     <ProjectReference Include="..\..\src\Vidarr.Indexers\Vidarr.Indexers.csproj" />
     <ProjectReference Include="..\..\src\Vidarr.Scheduler\Vidarr.Scheduler.csproj" />
     <ProjectReference Include="..\Vidarr.Tests.Common\Vidarr.Tests.Common.csproj" />

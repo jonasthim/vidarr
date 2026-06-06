@@ -65,6 +65,13 @@ builder.Services.AddSingleton<IDownloadClient>(sp => new YtDlpDownloadClient(
     sp.GetRequiredService<IProcessRunner>(),
     sp.GetRequiredService<IFileSystem>()));
 
+// Download-client factory registry (Phase 4) — DB-backed configs get materialised at poll time.
+builder.Services.AddSingleton<IDownloadClientFactory, QBittorrentFactory>();
+builder.Services.AddSingleton<IDownloadClientFactory, TransmissionFactory>();
+builder.Services.AddSingleton<IDownloadClientFactory, DelugeFactory>();
+builder.Services.AddSingleton<IDownloadClientFactory, YtDlpFactory>();
+builder.Services.AddScoped<IDownloadClientRegistry, DownloadClientRegistry>();
+
 builder.Services.AddSingleton<IEventBus, InProcessEventBus>();
 builder.Services.AddSingleton<ICommandQueue, ChannelCommandQueue>();
 builder.Services.AddSingleton<ICommandDispatcher, CommandDispatcher>();
@@ -86,6 +93,7 @@ app.UseApiKeyAuth(new ApiKeyOptions(apiKey));
 app.MapVidarrApi();
 app.MapVidarrSettingsApi();
 app.MapVidarrReleaseApi();
+app.MapVidarrDownloadClientApi();
 
 var wwwroot = Path.Combine(builder.Environment.ContentRootPath, "wwwroot");
 if (Directory.Exists(wwwroot))

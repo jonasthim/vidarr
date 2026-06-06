@@ -210,7 +210,44 @@ export const api = {
     if (params.query) qs.set("query", params.query);
     return call<ReleaseSearchResponse>(`/release?${qs}`);
   },
+
+  // download clients
+  listDownloadClients: () => call<DownloadClientConfigDto[]>("/downloadclient"),
+  createDownloadClient: (body: Omit<DownloadClientConfigDto, "id">) =>
+    call<DownloadClientConfigDto>("/downloadclient", {
+      method: "POST",
+      body: JSON.stringify(body),
+    }),
+  deleteDownloadClient: (id: number) =>
+    call<unknown>(`/downloadclient/${id}`, { method: "DELETE" }),
+  listDownloadClientSchemas: () => call<DownloadClientSchema[]>("/downloadclient/schema"),
+  testDownloadClient: (implementation: string, settingsJson: string) =>
+    call<DownloadClientTestResult>("/downloadclient/test", {
+      method: "POST",
+      body: JSON.stringify({ implementation, settingsJson }),
+    }),
 };
+
+export type DownloadClientConfigDto = {
+  id: number;
+  name: string;
+  implementation: string;
+  settingsJson: string;
+  priority: number;
+  enable: boolean;
+  category?: string | null;
+  removesCompletedDownloads: boolean;
+  tags: number[];
+};
+
+export type DownloadClientSchema = {
+  implementation: string;
+  displayName: string;
+  protocol: string;
+  fields: IndexerSchemaField[];
+};
+
+export type DownloadClientTestResult = { success: boolean; message?: string };
 
 export type IndexerConfigDto = {
   id: number;

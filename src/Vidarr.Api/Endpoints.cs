@@ -103,19 +103,53 @@ public static class Endpoints
             return Results.Accepted(value: new CommandResponse("queued", cmd.Name));
         });
 
-        v1.MapGet("/queue", async (IDownloadClient client, CancellationToken ct) =>
+        v1.MapGet("/queue", async (
+            IDownloadClient client,
+            [Microsoft.AspNetCore.Mvc.FromServices] Vidarr.DownloadClients.IDownloadClientRegistry? registry,
+            CancellationToken ct) =>
         {
-            var items = await client.GetItemsAsync(ct);
-            return Results.Ok(items.Select(i => new
+            // Aggregate items from the in-DI default IDownloadClient plus every persisted
+            // download-client config. The default client (yt-dlp) is queried first so its
+            // entries appear before externally-managed torrents/usenet items.
+            var all = new List<(DownloadClientItem Item, string ClientName)>();
+
+            var defaultItems = await client.GetItemsAsync(ct);
+            foreach (var i in defaultItems)
             {
-                id = i.Id.Value,
-                title = i.Title,
-                status = i.Status.ToString(),
-                totalBytes = i.TotalBytes,
-                remainingBytes = i.RemainingBytes,
-                etaSeconds = i.Eta?.TotalSeconds,
-                outputPath = i.OutputPath,
-                message = i.Message,
+                all.Add((i, client.Name));
+            }
+
+            if (registry is not null)
+            {
+                var active = await registry.GetActiveAsync(ct);
+                foreach (var dc in active)
+                {
+                    try
+                    {
+                        var items = await dc.GetItemsAsync(ct);
+                        foreach (var i in items) all.Add((i, dc.Name));
+                    }
+                    catch (Exception ex) when (ex is not OperationCanceledException)
+                    {
+                        all.Add((new DownloadClientItem(new DownloadClientItemId(string.Empty),
+                            Title: $"<error from {dc.Name}>", TotalBytes: null, RemainingBytes: null,
+                            Status: DownloadItemStatus.Failed, OutputPath: null, Eta: null,
+                            Message: ex.Message), dc.Name));
+                    }
+                }
+            }
+
+            return Results.Ok(all.Select(t => new
+            {
+                id = t.Item.Id.Value,
+                title = t.Item.Title,
+                status = t.Item.Status.ToString(),
+                totalBytes = t.Item.TotalBytes,
+                remainingBytes = t.Item.RemainingBytes,
+                etaSeconds = t.Item.Eta?.TotalSeconds,
+                outputPath = t.Item.OutputPath,
+                message = t.Item.Message,
+                downloadClient = t.ClientName,
             }).ToArray());
         });
 
