@@ -281,6 +281,18 @@ export const api = {
     }),
 
   // indexers
+  listNotifications: () => call<NotificationConfigDto[]>("/notification"),
+  createNotification: (body: Omit<NotificationConfigDto, "id">) =>
+    call<NotificationConfigDto>("/notification", { method: "POST", body: JSON.stringify(body) }),
+  deleteNotification: (id: number) =>
+    call<unknown>(`/notification/${id}`, { method: "DELETE" }),
+  listNotificationSchemas: () => call<NotificationSchema[]>("/notification/schema"),
+  testNotification: (implementation: string, settingsJson: string) =>
+    call<{ success: boolean; message?: string }>("/notification/test", {
+      method: "POST",
+      body: JSON.stringify({ implementation, settingsJson }),
+    }),
+
   listIndexers: () => call<IndexerConfigDto[]>("/indexer"),
   createIndexer: (body: Omit<IndexerConfigDto, "id">) =>
     call<IndexerConfigDto>("/indexer", {
@@ -411,6 +423,33 @@ export type IndexerSchemaField = {
   required: boolean;
   helpText?: string;
 };
+
+export type NotificationConfigDto = {
+  id: number;
+  name: string;
+  implementation: string;
+  settingsJson: string;
+  enable: boolean;
+  subscribedEvents: number[];
+  tags: number[];
+};
+
+export type NotificationSchema = {
+  implementation: string;
+  displayName: string;
+  fields: IndexerSchemaField[];
+  supportedEvents: string[];
+};
+
+export const NOTIFICATION_EVENT_TYPES: { value: number; label: string }[] = [
+  { value: 1, label: "OnGrab" },
+  { value: 2, label: "OnImport" },
+  { value: 3, label: "OnUpgrade" },
+  { value: 4, label: "OnDelete" },
+  { value: 5, label: "OnHealthIssue" },
+  { value: 6, label: "OnApplicationUpdate" },
+  { value: 7, label: "OnTest" },
+];
 
 export type IndexerSchema = {
   implementation: string;

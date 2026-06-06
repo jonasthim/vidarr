@@ -8,6 +8,7 @@ import { DownloadClientsPanel } from "../components/DownloadClientsPanel";
 import { CustomFormatsPanel } from "../components/CustomFormatsPanel";
 import { BlocklistPanel } from "../components/BlocklistPanel";
 import { DiscoveryRulesPanel } from "../components/DiscoveryRulesPanel";
+import { NotificationsPanel } from "../components/NotificationsPanel";
 
 type Pane =
   | "general"
@@ -17,6 +18,7 @@ type Pane =
   | "tags"
   | "indexers"
   | "downloadclients"
+  | "notifications"
   | "blocklist"
   | "discoveryrules";
 
@@ -34,6 +36,7 @@ export function SettingsPage(): JSX.Element {
               ["customformats", "Custom Formats"],
               ["indexers", "Indexers"],
               ["downloadclients", "Download Clients"],
+              ["notifications", "Notifications"],
               ["discoveryrules", "Discovery Rules"],
               ["rootfolders", "Root Folders"],
               ["tags", "Tags"],
@@ -61,6 +64,7 @@ export function SettingsPage(): JSX.Element {
         {pane === "customformats" && <CustomFormatsPanel />}
         {pane === "indexers" && <IndexersPanel />}
         {pane === "downloadclients" && <DownloadClientsPanel />}
+        {pane === "notifications" && <NotificationsPanel />}
         {pane === "discoveryrules" && <DiscoveryRulesPanel />}
         {pane === "rootfolders" && <RootFoldersPanel />}
         {pane === "tags" && <TagsPanel />}

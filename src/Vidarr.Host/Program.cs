@@ -1,11 +1,15 @@
 using System.Diagnostics.CodeAnalysis;
+using System.Text.Json;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
 using Serilog;
 using Vidarr.Api;
 using Vidarr.Catalog;
+using Vidarr.Catalog.Repositories;
 using Vidarr.Contracts.Abstractions;
 using Vidarr.Contracts.Domain;
+using Vidarr.Contracts.Models;
 using Vidarr.Decision;
 using Vidarr.DownloadClients;
 using Vidarr.EventBus;
@@ -86,6 +90,42 @@ builder.Services.AddSingleton<IDownloadClientFactory, YtDlpFactory>();
 builder.Services.AddScoped<IDownloadClientRegistry, DownloadClientRegistry>();
 
 builder.Services.AddSingleton<IEventBus, InProcessEventBus>();
+
+// Phase 11 — notification factories + dispatcher.
+builder.Services.AddSingleton<INotificationFactory, WebhookFactory>();
+builder.Services.AddSingleton<INotificationFactory, PlexFactory>();
+builder.Services.AddSingleton<INotificationFactory, JellyfinFactory>();
+builder.Services.AddSingleton<INotificationFactory, DiscordFactory>();
+builder.Services.AddSingleton<NotificationDispatcher>(sp =>
+{
+    var bus = sp.GetRequiredService<IEventBus>();
+    var logger = sp.GetRequiredService<ILogger<NotificationDispatcher>>();
+    var factories = sp.GetServices<INotificationFactory>().ToDictionary(f => f.Implementation, StringComparer.OrdinalIgnoreCase);
+    var notifierFactory = new Func<IReadOnlyList<INotification>>(() =>
+    {
+        using var scope = sp.CreateScope();
+        var repo = scope.ServiceProvider.GetRequiredService<INotificationConfigRepository>();
+        var configs = repo.ListAsync(default).GetAwaiter().GetResult();
+        var notifiers = new List<INotification>();
+        foreach (var c in configs.Where(x => x.Enable))
+        {
+            if (!factories.TryGetValue(c.Implementation, out var factory)) continue;
+            try
+            {
+                var events = JsonSerializer.Deserialize<int[]>(c.SubscribedEventsJson) ?? [];
+                var set = events.Select(e => (NotificationEventType)e).ToHashSet();
+                notifiers.Add(factory.Create(c.Id, c.Name, c.SettingsJson, set));
+            }
+            catch (Exception ex) when (ex is not OperationCanceledException)
+            {
+                logger.LogWarning(ex, "Failed to materialise notification {Name}", c.Name);
+            }
+        }
+        return notifiers;
+    });
+    return new NotificationDispatcher(bus, notifierFactory, logger);
+});
+builder.Services.AddHostedService<NotificationDispatcherHostedService>();
 builder.Services.AddSingleton<ICommandQueue, ChannelCommandQueue>();
 builder.Services.AddSingleton<ICommandDispatcher, CommandDispatcher>();
 builder.Services.AddHostedService<CommandWorker>();
@@ -124,6 +164,7 @@ app.MapVidarrReleaseApi();
 app.MapVidarrDownloadClientApi();
 app.MapVidarrSystemCommandApi();
 app.MapVidarrDiscoveryRuleApi();
+app.MapVidarrNotificationApi();
 
 var wwwroot = Path.Combine(builder.Environment.ContentRootPath, "wwwroot");
 if (Directory.Exists(wwwroot))
