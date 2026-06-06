@@ -1,2 +1,9 @@
 <Solution>
+  <Folder Name="/src/">
+    <Project Path="src/Vidarr.Contracts/Vidarr.Contracts.csproj" />
+    <Project Path="src/Vidarr.Infrastructure/Vidarr.Infrastructure.csproj" />
+  </Folder>
+  <Folder Name="/tests/">
+    <Project Path="tests/Vidarr.Tests.Common/Vidarr.Tests.Common.csproj" />
+  </Folder>
 </Solution>
