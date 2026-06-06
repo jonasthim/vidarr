@@ -19,6 +19,10 @@ trim_trailing_whitespace = false
 
 [*.cs]
 dotnet_diagnostic.CA1014.severity = none
+dotnet_diagnostic.CA1305.severity = suggestion
+dotnet_diagnostic.CA1711.severity = none
+dotnet_diagnostic.CA1826.severity = suggestion
+dotnet_diagnostic.CA1873.severity = suggestion
 dotnet_diagnostic.CA1062.severity = suggestion
 dotnet_diagnostic.CA1716.severity = none
 dotnet_diagnostic.CA1848.severity = suggestion

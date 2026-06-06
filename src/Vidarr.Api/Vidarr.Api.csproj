@@ -1,0 +1,23 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <IsPackable>false</IsPackable>
+    <AllowMissingPrunePackageData>true</AllowMissingPrunePackageData>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <FrameworkReference Include="Microsoft.AspNetCore.App" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Vidarr.Contracts\Vidarr.Contracts.csproj" />
+    <ProjectReference Include="..\Vidarr.Catalog\Vidarr.Catalog.csproj" />
+    <ProjectReference Include="..\Vidarr.Metadata\Vidarr.Metadata.csproj" />
+    <ProjectReference Include="..\Vidarr.Scheduler\Vidarr.Scheduler.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="FluentValidation.AspNetCore" />
+  </ItemGroup>
+
+</Project>

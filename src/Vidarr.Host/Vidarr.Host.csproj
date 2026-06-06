@@ -1,0 +1,32 @@
+<Project Sdk="Microsoft.NET.Sdk.Web">
+
+  <PropertyGroup>
+    <AllowMissingPrunePackageData>true</AllowMissingPrunePackageData>
+    <UserSecretsId>vidarr-host-secrets</UserSecretsId>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Vidarr.Api\Vidarr.Api.csproj" />
+    <ProjectReference Include="..\Vidarr.Catalog\Vidarr.Catalog.csproj" />
+    <ProjectReference Include="..\Vidarr.Contracts\Vidarr.Contracts.csproj" />
+    <ProjectReference Include="..\Vidarr.Decision\Vidarr.Decision.csproj" />
+    <ProjectReference Include="..\Vidarr.DownloadClients\Vidarr.DownloadClients.csproj" />
+    <ProjectReference Include="..\Vidarr.EventBus\Vidarr.EventBus.csproj" />
+    <ProjectReference Include="..\Vidarr.Importer\Vidarr.Importer.csproj" />
+    <ProjectReference Include="..\Vidarr.Indexers\Vidarr.Indexers.csproj" />
+    <ProjectReference Include="..\Vidarr.Infrastructure\Vidarr.Infrastructure.csproj" />
+    <ProjectReference Include="..\Vidarr.Metadata\Vidarr.Metadata.csproj" />
+    <ProjectReference Include="..\Vidarr.Naming\Vidarr.Naming.csproj" />
+    <ProjectReference Include="..\Vidarr.Notifications\Vidarr.Notifications.csproj" />
+    <ProjectReference Include="..\Vidarr.Scheduler\Vidarr.Scheduler.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.EntityFrameworkCore" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite" />
+    <PackageReference Include="Serilog.AspNetCore" />
+    <PackageReference Include="Serilog.Sinks.Console" />
+    <PackageReference Include="Serilog.Sinks.File" />
+  </ItemGroup>
+
+</Project>
