@@ -86,6 +86,18 @@ builder.Services.AddHostedService<CommandWorker>();
 
 builder.Services.AddScoped<ICommandHandler<ArtistSearchCommand>, ArtistSearchCommandHandler>();
 
+// Phase 7 — Recurring jobs + history.
+builder.Services.AddSingleton<IJobRunHistory, InMemoryJobRunHistory>();
+builder.Services.AddSingleton<IRecurringJobRunner, RecurringJobRunner>();
+builder.Services.AddSingleton<IRecurringJob, Vidarr.Host.Jobs.ArtistRefreshJob>();
+builder.Services.AddSingleton<IRecurringJob, Vidarr.Host.Jobs.RssSyncJob>();
+builder.Services.AddSingleton<IRecurringJob, Vidarr.Host.Jobs.DownloadStatusPollJob>();
+builder.Services.AddSingleton<IRecurringJob, Vidarr.Host.Jobs.WantedVideoSearchJob>();
+builder.Services.AddSingleton<IRecurringJob, Vidarr.Host.Jobs.RuleSetEvaluationJob>();
+builder.Services.AddSingleton<IRecurringJob, Vidarr.Host.Jobs.BackupJob>();
+builder.Services.AddSingleton<IRecurringJob, Vidarr.Host.Jobs.HealthCheckJob>();
+builder.Services.AddHostedService<RecurringJobsHostedService>();
+
 var app = builder.Build();
 
 using (var scope = app.Services.CreateScope())
@@ -101,6 +113,7 @@ app.MapVidarrApi();
 app.MapVidarrSettingsApi();
 app.MapVidarrReleaseApi();
 app.MapVidarrDownloadClientApi();
+app.MapVidarrSystemCommandApi();
 
 var wwwroot = Path.Combine(builder.Environment.ContentRootPath, "wwwroot");
 if (Directory.Exists(wwwroot))

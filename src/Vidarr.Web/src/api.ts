@@ -218,6 +218,15 @@ export const api = {
     return call<ReleaseSearchResponse>(`/release?${qs}`);
   },
 
+  // system commands
+  listCommands: () => call<SystemCommand[]>("/system/command"),
+  triggerCommand: (name: string) =>
+    call<unknown>(`/system/command/${name}`, { method: "POST" }),
+  listJobRuns: (job?: string) =>
+    call<JobRun[]>(`/system/jobs/runs${job ? `?job=${job}` : ""}`),
+  listHistory: (artistId?: number) =>
+    call<HistoryItem[]>(`/history${artistId ? `?artistId=${artistId}` : ""}`),
+
   // download clients
   listDownloadClients: () => call<DownloadClientConfigDto[]>("/downloadclient"),
   createDownloadClient: (body: Omit<DownloadClientConfigDto, "id">) =>
@@ -255,6 +264,34 @@ export type DownloadClientSchema = {
 };
 
 export type DownloadClientTestResult = { success: boolean; message?: string };
+
+export type SystemCommand = {
+  name: string;
+  intervalSeconds: number;
+  lastRun?: string;
+  lastRunOk: boolean;
+  recent: JobRun[];
+};
+
+export type JobRun = {
+  startedAt: string;
+  finishedAt?: string;
+  succeeded: boolean;
+  failureReason?: string;
+};
+
+export type HistoryItem = {
+  id: number;
+  eventType: string;
+  date: string;
+  artistId?: number;
+  musicVideoId?: number;
+  releaseTitle?: string;
+  indexerName?: string;
+  downloadClientName?: string;
+  qualityId?: number;
+  dataJson: string;
+};
 
 export type IndexerConfigDto = {
   id: number;

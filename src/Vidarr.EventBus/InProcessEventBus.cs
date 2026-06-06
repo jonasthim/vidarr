@@ -19,8 +19,10 @@ public sealed class InProcessEventBus : IEventBus
         ArgumentNullException.ThrowIfNull(evt);
         if (!_subs.TryGetValue(typeof(TEvent), out var handlers))
         {
+            _logger.LogDebug("Event {Event} published with no subscribers.", typeof(TEvent).Name);
             return;
         }
+        _logger.LogDebug("Event {Event} → {Subscribers} subscribers.", typeof(TEvent).Name, handlers.Count);
 
         Subscription[] snapshot;
         lock (handlers)
