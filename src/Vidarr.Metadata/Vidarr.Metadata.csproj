@@ -1,0 +1,7 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <ItemGroup>
+    <ProjectReference Include="..\Vidarr.Contracts\Vidarr.Contracts.csproj" />
+  </ItemGroup>
+
+</Project>
