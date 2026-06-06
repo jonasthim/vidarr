@@ -7,6 +7,7 @@
     <Project Path="src/Vidarr.Decision/Vidarr.Decision.csproj" />
     <Project Path="src/Vidarr.DownloadClients/Vidarr.DownloadClients.csproj" />
     <Project Path="src/Vidarr.EventBus/Vidarr.EventBus.csproj" />
+    <Project Path="src/Vidarr.Health/Vidarr.Health.csproj" />
     <Project Path="src/Vidarr.Host/Vidarr.Host.csproj" />
     <Project Path="src/Vidarr.Importer/Vidarr.Importer.csproj" />
     <Project Path="src/Vidarr.Indexers/Vidarr.Indexers.csproj" />
@@ -24,6 +25,7 @@
     <Project Path="tests/Vidarr.Decision.Tests/Vidarr.Decision.Tests.csproj" />
     <Project Path="tests/Vidarr.DownloadClients.Tests/Vidarr.DownloadClients.Tests.csproj" />
     <Project Path="tests/Vidarr.EventBus.Tests/Vidarr.EventBus.Tests.csproj" />
+    <Project Path="tests/Vidarr.Health.Tests/Vidarr.Health.Tests.csproj" />
     <Project Path="tests/Vidarr.Importer.Tests/Vidarr.Importer.Tests.csproj" />
     <Project Path="tests/Vidarr.Indexers.Tests/Vidarr.Indexers.Tests.csproj" />
     <Project Path="tests/Vidarr.IntegrationTests/Vidarr.IntegrationTests.csproj" />

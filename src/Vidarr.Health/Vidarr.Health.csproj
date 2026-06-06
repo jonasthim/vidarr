@@ -1,0 +1,14 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <ItemGroup>
+    <ProjectReference Include="..\Vidarr.Catalog\Vidarr.Catalog.csproj" />
+    <ProjectReference Include="..\Vidarr.Contracts\Vidarr.Contracts.csproj" />
+    <ProjectReference Include="..\Vidarr.DownloadClients\Vidarr.DownloadClients.csproj" />
+    <ProjectReference Include="..\Vidarr.Indexers\Vidarr.Indexers.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" />
+  </ItemGroup>
+
+</Project>

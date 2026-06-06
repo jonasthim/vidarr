@@ -144,6 +144,17 @@ builder.Services.AddSingleton<IRecurringJob, Vidarr.Host.Jobs.DownloadStatusPoll
 builder.Services.AddSingleton<IRecurringJob, Vidarr.Host.Jobs.WantedVideoSearchJob>();
 builder.Services.AddSingleton<IRecurringJob, Vidarr.Host.Jobs.RuleSetEvaluationJob>();
 builder.Services.AddSingleton<IRecurringJob, Vidarr.Host.Jobs.BackupJob>();
+
+// Phase 12 — Health monitor + checks.
+builder.Services.AddScoped<Vidarr.Health.IHealthCheck, Vidarr.Health.DiskSpaceCheck>();
+builder.Services.AddScoped<Vidarr.Health.IHealthCheck, Vidarr.Health.RootFolderAccessibleCheck>();
+builder.Services.AddScoped<Vidarr.Health.IHealthCheck, Vidarr.Health.IndexerReachableCheck>();
+builder.Services.AddScoped<Vidarr.Health.IHealthCheck, Vidarr.Health.DownloadClientReachableCheck>();
+builder.Services.AddScoped<Vidarr.Health.IHealthCheck, Vidarr.Health.YtDlpVersionCheck>();
+builder.Services.AddSingleton<Vidarr.Health.IHealthMonitor>(sp => new Vidarr.Health.HealthMonitor(
+    new HealthCheckResolver(sp),
+    sp.GetRequiredService<IEventBus>(),
+    sp.GetRequiredService<ILogger<Vidarr.Health.HealthMonitor>>()));
 builder.Services.AddSingleton<IRecurringJob, Vidarr.Host.Jobs.HealthCheckJob>();
 builder.Services.AddHostedService<RecurringJobsHostedService>();
 
@@ -165,6 +176,7 @@ app.MapVidarrDownloadClientApi();
 app.MapVidarrSystemCommandApi();
 app.MapVidarrDiscoveryRuleApi();
 app.MapVidarrNotificationApi();
+app.MapVidarrHealthApi();
 
 var wwwroot = Path.Combine(builder.Environment.ContentRootPath, "wwwroot");
 if (Directory.Exists(wwwroot))

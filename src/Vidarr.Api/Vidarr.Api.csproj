@@ -15,6 +15,7 @@
     <ProjectReference Include="..\Vidarr.Decision\Vidarr.Decision.csproj" />
     <ProjectReference Include="..\Vidarr.DownloadClients\Vidarr.DownloadClients.csproj" />
     <ProjectReference Include="..\Vidarr.EventBus\Vidarr.EventBus.csproj" />
+    <ProjectReference Include="..\Vidarr.Health\Vidarr.Health.csproj" />
     <ProjectReference Include="..\Vidarr.Indexers\Vidarr.Indexers.csproj" />
     <ProjectReference Include="..\Vidarr.Metadata\Vidarr.Metadata.csproj" />
     <ProjectReference Include="..\Vidarr.Notifications\Vidarr.Notifications.csproj" />

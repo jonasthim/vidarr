@@ -61,17 +61,20 @@ public sealed class BackupJob : IRecurringJob
     }
 }
 
-/// <summary>Stubbed in P7; the health checks land in Phase 12.</summary>
-[ExcludeFromCodeCoverage(Justification = "Stub job — engine in Phase 12.")]
 public sealed class HealthCheckJob : IRecurringJob
 {
+    private readonly Vidarr.Health.IHealthMonitor _monitor;
     private readonly ILogger<HealthCheckJob> _logger;
-    public HealthCheckJob(ILogger<HealthCheckJob> logger) { _logger = logger; }
+    public HealthCheckJob(Vidarr.Health.IHealthMonitor monitor, ILogger<HealthCheckJob> logger)
+    {
+        _monitor = monitor;
+        _logger = logger;
+    }
     public string Name => "HealthCheck";
     public TimeSpan Interval => TimeSpan.FromMinutes(15);
-    public Task RunAsync(CancellationToken ct)
+    public async Task RunAsync(CancellationToken ct)
     {
-        _logger.LogInformation("HealthCheck: deferred to Phase 12 (checks not yet wired)");
-        return Task.CompletedTask;
+        var status = await _monitor.RunAllAsync(ct);
+        _logger.LogInformation("HealthCheck: {Count} active issue(s)", status.Active.Count);
     }
 }
