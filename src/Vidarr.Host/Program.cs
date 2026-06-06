@@ -72,10 +72,13 @@ using (var scope = app.Services.CreateScope())
 {
     var db = scope.ServiceProvider.GetRequiredService<VidarrDbContext>();
     await db.Database.EnsureCreatedAsync();
+    var seeder = scope.ServiceProvider.GetRequiredService<Vidarr.Catalog.Seeding.IDataSeeder>();
+    await seeder.SeedAsync(db, default);
 }
 
 app.UseApiKeyAuth(new ApiKeyOptions(apiKey));
 app.MapVidarrApi();
+app.MapVidarrSettingsApi();
 
 var wwwroot = Path.Combine(builder.Environment.ContentRootPath, "wwwroot");
 if (Directory.Exists(wwwroot))
