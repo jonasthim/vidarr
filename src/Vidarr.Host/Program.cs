@@ -29,11 +29,11 @@ builder.Host.UseSerilog((ctx, lc) => lc
     .WriteTo.File(Path.Combine(ctx.HostingEnvironment.ContentRootPath, "data", "logs", "vidarr-.log"), rollingInterval: RollingInterval.Day));
 
 var config = builder.Configuration;
-var apiKey = config["Vidarr:ApiKey"] ?? Environment.GetEnvironmentVariable("VIDARR_API_KEY") ?? Guid.NewGuid().ToString("N");
-var sqlitePath = config["Vidarr:Sqlite:Path"] ?? Environment.GetEnvironmentVariable("VIDARR_SQLITE_PATH") ?? "data/vidarr.db";
+var apiKey = Environment.GetEnvironmentVariable("VIDARR_API_KEY") ?? config["Vidarr:ApiKey"] ?? Guid.NewGuid().ToString("N");
+var sqlitePath = Environment.GetEnvironmentVariable("VIDARR_SQLITE_PATH") ?? config["Vidarr:Sqlite:Path"] ?? "data/vidarr.db";
 var sqliteConn = $"Data Source={sqlitePath}";
-var imvdbKey = config["Vidarr:Imvdb:ApiKey"] ?? Environment.GetEnvironmentVariable("VIDARR_IMVDB_KEY");
-var incompleteFolder = config["Vidarr:IncompleteFolder"] ?? Environment.GetEnvironmentVariable("VIDARR_INCOMPLETE") ?? "data/incomplete";
+var imvdbKey = Environment.GetEnvironmentVariable("VIDARR_IMVDB_KEY") ?? config["Vidarr:Imvdb:ApiKey"];
+var incompleteFolder = Environment.GetEnvironmentVariable("VIDARR_INCOMPLETE") ?? config["Vidarr:IncompleteFolder"] ?? "data/incomplete";
 
 Directory.CreateDirectory(Path.GetDirectoryName(Path.GetFullPath(sqlitePath))!);
 Directory.CreateDirectory(Path.GetFullPath(incompleteFolder));

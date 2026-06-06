@@ -46,8 +46,4 @@
     <Copy SourceFiles="@(_WebOutput)" DestinationFiles="@(_WebOutput->'$(WebWwwroot)%(RecursiveDir)%(Filename)%(Extension)')" />
   </Target>
 
-  <ItemGroup>
-    <Content Include="wwwroot\**\*.*" CopyToOutputDirectory="PreserveNewest" Condition="Exists('wwwroot')" />
-  </ItemGroup>
-
 </Project>

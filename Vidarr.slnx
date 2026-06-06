@@ -23,6 +23,7 @@
     <Project Path="tests/Vidarr.EventBus.Tests/Vidarr.EventBus.Tests.csproj" />
     <Project Path="tests/Vidarr.Importer.Tests/Vidarr.Importer.Tests.csproj" />
     <Project Path="tests/Vidarr.Indexers.Tests/Vidarr.Indexers.Tests.csproj" />
+    <Project Path="tests/Vidarr.IntegrationTests/Vidarr.IntegrationTests.csproj" />
     <Project Path="tests/Vidarr.Metadata.Tests/Vidarr.Metadata.Tests.csproj" />
     <Project Path="tests/Vidarr.Naming.Tests/Vidarr.Naming.Tests.csproj" />
     <Project Path="tests/Vidarr.Notifications.Tests/Vidarr.Notifications.Tests.csproj" />
