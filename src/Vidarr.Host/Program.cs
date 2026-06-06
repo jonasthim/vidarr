@@ -52,6 +52,12 @@ builder.Services.AddSingleton(new YouTubeIndexerSettings(ChannelIds: [], MaxResu
 builder.Services.AddSingleton<IIndexer>(sp => new YouTubeIndexer(
     1, "YouTube", sp.GetRequiredService<YouTubeIndexerSettings>(), sp.GetRequiredService<IProcessRunner>()));
 
+// Indexer factories — Phase 3 plug-in registry used by REST /indexer/schema + /indexer/test.
+builder.Services.AddSingleton<IIndexerFactory, NewznabIndexerFactory>();
+builder.Services.AddSingleton<IIndexerFactory, TorznabIndexerFactory>();
+builder.Services.AddSingleton<IIndexerFactory, YouTubeIndexerFactory>();
+builder.Services.AddSingleton<IReleaseSearchService, ReleaseSearchService>();
+
 builder.Services.AddSingleton(new YtDlpDownloadClientSettings(IncompleteFolder: incompleteFolder, Timeout: TimeSpan.FromHours(1)));
 builder.Services.AddSingleton<IDownloadClient>(sp => new YtDlpDownloadClient(
     1, "yt-dlp",
@@ -79,6 +85,7 @@ using (var scope = app.Services.CreateScope())
 app.UseApiKeyAuth(new ApiKeyOptions(apiKey));
 app.MapVidarrApi();
 app.MapVidarrSettingsApi();
+app.MapVidarrReleaseApi();
 
 var wwwroot = Path.Combine(builder.Environment.ContentRootPath, "wwwroot");
 if (Directory.Exists(wwwroot))

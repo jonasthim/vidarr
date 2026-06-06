@@ -180,4 +180,82 @@ export const api = {
       method: "PUT",
       body: JSON.stringify(body),
     }),
+
+  // indexers
+  listIndexers: () => call<IndexerConfigDto[]>("/indexer"),
+  createIndexer: (body: Omit<IndexerConfigDto, "id">) =>
+    call<IndexerConfigDto>("/indexer", {
+      method: "POST",
+      body: JSON.stringify(body),
+    }),
+  updateIndexer: (id: number, body: Omit<IndexerConfigDto, "id">) =>
+    call<IndexerConfigDto>(`/indexer/${id}`, {
+      method: "PUT",
+      body: JSON.stringify(body),
+    }),
+  deleteIndexer: (id: number) =>
+    call<unknown>(`/indexer/${id}`, { method: "DELETE" }),
+  listIndexerSchemas: () => call<IndexerSchema[]>("/indexer/schema"),
+  testIndexer: (implementation: string, settingsJson: string) =>
+    call<IndexerTestResult>("/indexer/test", {
+      method: "POST",
+      body: JSON.stringify({ implementation, settingsJson }),
+    }),
+
+  // search
+  searchReleases: (params: { artistId?: number; musicVideoId?: number; query?: string }) => {
+    const qs = new URLSearchParams();
+    if (params.artistId !== undefined) qs.set("artistId", String(params.artistId));
+    if (params.musicVideoId !== undefined) qs.set("musicVideoId", String(params.musicVideoId));
+    if (params.query) qs.set("query", params.query);
+    return call<ReleaseSearchResponse>(`/release?${qs}`);
+  },
+};
+
+export type IndexerConfigDto = {
+  id: number;
+  name: string;
+  implementation: string;
+  settingsJson: string;
+  priority: number;
+  enableRss: boolean;
+  enableAutomaticSearch: boolean;
+  enableInteractiveSearch: boolean;
+  preferredDownloadClientId?: number | null;
+  tags: number[];
+};
+
+export type IndexerSchemaField = {
+  name: string;
+  label: string;
+  type: string;
+  required: boolean;
+  helpText?: string;
+};
+
+export type IndexerSchema = {
+  implementation: string;
+  displayName: string;
+  fields: IndexerSchemaField[];
+};
+
+export type IndexerTestResult = { success: boolean; message?: string };
+
+export type ReleaseSearchResponse = {
+  releases: ReleaseSearchItem[];
+  failures: { indexerId: number; indexerName: string; reason: string }[];
+  indexersQueried: number;
+};
+
+export type ReleaseSearchItem = {
+  title: string;
+  sourceUrl: string;
+  magnet?: string;
+  sizeBytes?: number;
+  publishedAt?: string;
+  seeders?: number;
+  leechers?: number;
+  protocol: string;
+  indexerName: string;
+  indexerCategory?: string;
 };

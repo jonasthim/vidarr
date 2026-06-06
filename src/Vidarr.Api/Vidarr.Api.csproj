@@ -12,6 +12,7 @@
   <ItemGroup>
     <ProjectReference Include="..\Vidarr.Contracts\Vidarr.Contracts.csproj" />
     <ProjectReference Include="..\Vidarr.Catalog\Vidarr.Catalog.csproj" />
+    <ProjectReference Include="..\Vidarr.Indexers\Vidarr.Indexers.csproj" />
     <ProjectReference Include="..\Vidarr.Metadata\Vidarr.Metadata.csproj" />
     <ProjectReference Include="..\Vidarr.Scheduler\Vidarr.Scheduler.csproj" />
   </ItemGroup>
