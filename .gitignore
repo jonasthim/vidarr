@@ -1,0 +1,41 @@
+# .NET
+bin/
+obj/
+*.user
+*.suo
+.vs/
+*.swp
+TestResults/
+coverage*.xml
+coverage*.json
+coverage*.cobertura.xml
+*.opencover.xml
+
+# Node / Vite
+node_modules/
+dist/
+*.log
+.vite/
+.cache/
+
+# Editor / OS
+.idea/
+.vscode/
+*.DS_Store
+Thumbs.db
+
+# Local runtime / config
+appsettings.Local.json
+appsettings.Development.json.local
+*.db
+*.db-journal
+*.db-wal
+*.db-shm
+/data/
+/config/
+/library/
+/downloads/
+
+# Backups
+/backups/
+*.zip.bak
