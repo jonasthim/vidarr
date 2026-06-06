@@ -130,6 +130,85 @@ public sealed class DelugeFactory : IDownloadClientFactory
     }
 }
 
+public sealed class SABnzbdFactory : IDownloadClientFactory
+{
+    private readonly IHttpClient _http;
+    public SABnzbdFactory(IHttpClient http) { _http = http; }
+
+    public string Implementation => "SABnzbd";
+    public string DisplayName => "SABnzbd";
+    public DownloadProtocol Protocol => DownloadProtocol.Usenet;
+
+    public IReadOnlyList<DownloadClientFieldSchema> SettingsSchema { get; } =
+    [
+        new("baseUrl", "URL", "url", true, "e.g. http://localhost:8080"),
+        new("apiKey", "API key", "password", true),
+        new("category", "Category", "text", false),
+        new("priority", "Priority", "number", false, "-1=Low, 0=Normal, 1=High, 2=Force"),
+    ];
+
+    public IDownloadClient Create(int id, string name, string settingsJson)
+    {
+        var raw = JsonSerializer.Deserialize<RawSettings>(settingsJson) ?? new RawSettings();
+        return new SABnzbdDownloadClient(id, name,
+            new SABnzbdSettings(
+                BaseUrl: new Uri(string.IsNullOrWhiteSpace(raw.BaseUrl) ? "http://localhost:8080" : raw.BaseUrl, UriKind.Absolute),
+                ApiKey: raw.ApiKey ?? string.Empty,
+                Category: raw.Category,
+                Priority: raw.Priority),
+            _http);
+    }
+
+    private sealed class RawSettings
+    {
+        public string? BaseUrl { get; set; }
+        public string? ApiKey { get; set; }
+        public string? Category { get; set; }
+        public int? Priority { get; set; }
+    }
+}
+
+public sealed class NZBGetFactory : IDownloadClientFactory
+{
+    private readonly IHttpClient _http;
+    public NZBGetFactory(IHttpClient http) { _http = http; }
+
+    public string Implementation => "NZBGet";
+    public string DisplayName => "NZBGet";
+    public DownloadProtocol Protocol => DownloadProtocol.Usenet;
+
+    public IReadOnlyList<DownloadClientFieldSchema> SettingsSchema { get; } =
+    [
+        new("baseUrl", "URL", "url", true, "e.g. http://localhost:6789"),
+        new("username", "Username", "text", true, "Default: nzbget"),
+        new("password", "Password", "password", true),
+        new("category", "Category", "text", false),
+        new("priority", "Priority", "number", false, "-100..900"),
+    ];
+
+    public IDownloadClient Create(int id, string name, string settingsJson)
+    {
+        var raw = JsonSerializer.Deserialize<RawSettings>(settingsJson) ?? new RawSettings();
+        return new NZBGetDownloadClient(id, name,
+            new NZBGetSettings(
+                BaseUrl: new Uri(string.IsNullOrWhiteSpace(raw.BaseUrl) ? "http://localhost:6789" : raw.BaseUrl, UriKind.Absolute),
+                Username: raw.Username ?? "nzbget",
+                Password: raw.Password ?? string.Empty,
+                Category: raw.Category,
+                Priority: raw.Priority),
+            _http);
+    }
+
+    private sealed class RawSettings
+    {
+        public string? BaseUrl { get; set; }
+        public string? Username { get; set; }
+        public string? Password { get; set; }
+        public string? Category { get; set; }
+        public int? Priority { get; set; }
+    }
+}
+
 public sealed class YtDlpFactory : IDownloadClientFactory
 {
     private readonly IProcessRunner _processes;

@@ -69,6 +69,8 @@ builder.Services.AddSingleton<IDownloadClient>(sp => new YtDlpDownloadClient(
 builder.Services.AddSingleton<IDownloadClientFactory, QBittorrentFactory>();
 builder.Services.AddSingleton<IDownloadClientFactory, TransmissionFactory>();
 builder.Services.AddSingleton<IDownloadClientFactory, DelugeFactory>();
+builder.Services.AddSingleton<IDownloadClientFactory, SABnzbdFactory>();
+builder.Services.AddSingleton<IDownloadClientFactory, NZBGetFactory>();
 builder.Services.AddSingleton<IDownloadClientFactory, YtDlpFactory>();
 builder.Services.AddScoped<IDownloadClientRegistry, DownloadClientRegistry>();
 
