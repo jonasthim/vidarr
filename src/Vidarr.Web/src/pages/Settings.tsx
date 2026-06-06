@@ -5,8 +5,9 @@ import { TagsPanel } from "../components/TagsPanel";
 import { GeneralSettingsPanel } from "../components/GeneralSettingsPanel";
 import { IndexersPanel } from "../components/IndexersPanel";
 import { DownloadClientsPanel } from "../components/DownloadClientsPanel";
+import { CustomFormatsPanel } from "../components/CustomFormatsPanel";
 
-type Pane = "general" | "profiles" | "rootfolders" | "tags" | "indexers" | "downloadclients";
+type Pane = "general" | "profiles" | "customformats" | "rootfolders" | "tags" | "indexers" | "downloadclients";
 
 export function SettingsPage(): JSX.Element {
   const [pane, setPane] = useState<Pane>("general");
@@ -19,6 +20,7 @@ export function SettingsPage(): JSX.Element {
             [
               ["general", "Media Management"],
               ["profiles", "Quality Profiles"],
+              ["customformats", "Custom Formats"],
               ["indexers", "Indexers"],
               ["downloadclients", "Download Clients"],
               ["rootfolders", "Root Folders"],
@@ -43,6 +45,7 @@ export function SettingsPage(): JSX.Element {
       <div className="settings-pane">
         {pane === "general" && <GeneralSettingsPanel />}
         {pane === "profiles" && <ProfilesPanel />}
+        {pane === "customformats" && <CustomFormatsPanel />}
         {pane === "indexers" && <IndexersPanel />}
         {pane === "downloadclients" && <DownloadClientsPanel />}
         {pane === "rootfolders" && <RootFoldersPanel />}

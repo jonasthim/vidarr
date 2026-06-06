@@ -165,3 +165,19 @@ form button:disabled {
 .muted {
   color: #93a0b0;
 }
+
+.custom-format-spec {
+  display: grid;
+  grid-template-columns: 200px 1fr auto auto auto;
+  align-items: center;
+  gap: 0.6rem;
+  padding: 0.45rem 0;
+  border-bottom: 1px dashed #2a2f37;
+}
+
+details pre {
+  background: #1c2026;
+  padding: 0.6rem;
+  border-radius: 6px;
+  overflow-x: auto;
+}

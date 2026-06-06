@@ -71,11 +71,16 @@ public sealed class DefaultReleaseComparer : IReleaseComparer
 {
     private readonly QualityProfile _profile;
     private readonly ProtocolPreference _protocolPreference;
+    private readonly IReadOnlyDictionary<string, int> _indexerPriority;
 
-    public DefaultReleaseComparer(QualityProfile profile, ProtocolPreference? protocolPreference = null)
+    public DefaultReleaseComparer(
+        QualityProfile profile,
+        ProtocolPreference? protocolPreference = null,
+        IReadOnlyDictionary<string, int>? indexerPriority = null)
     {
         _profile = profile;
         _protocolPreference = protocolPreference ?? ProtocolPreference.Default;
+        _indexerPriority = indexerPriority ?? new Dictionary<string, int>();
     }
 
     public int Compare(RemoteRelease? x, RemoteRelease? y)
@@ -98,6 +103,12 @@ public sealed class DefaultReleaseComparer : IReleaseComparer
         if (xRank != yRank)
         {
             return yRank.CompareTo(xRank);
+        }
+
+        // Higher Custom-Format score wins second.
+        if (x.Score != y.Score)
+        {
+            return y.Score.CompareTo(x.Score);
         }
 
         // Configured protocol preference next.
@@ -127,6 +138,14 @@ public sealed class DefaultReleaseComparer : IReleaseComparer
             {
                 return ySeed.CompareTo(xSeed);
             }
+        }
+
+        // Indexer priority (lower priority number wins, mirroring Sonarr semantics).
+        var xPrio = _indexerPriority.GetValueOrDefault(x.Info.IndexerName, int.MaxValue);
+        var yPrio = _indexerPriority.GetValueOrDefault(y.Info.IndexerName, int.MaxValue);
+        if (xPrio != yPrio)
+        {
+            return xPrio.CompareTo(yPrio);
         }
 
         // Larger size wins as a final tie-break.

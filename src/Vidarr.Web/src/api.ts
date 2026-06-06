@@ -74,6 +74,31 @@ export type QualityProfile = {
 
 export type Tag = { id: number; label: string };
 
+export type CustomFormat = {
+  id: number;
+  name: string;
+  includeCustomFormatWhenRenaming: boolean;
+  specificationsJson: string;
+};
+
+export type CustomFormatSpec = {
+  implementation: string;
+  negate?: boolean;
+  required?: boolean;
+  fields: Record<string, string | number>;
+};
+
+export const CUSTOM_FORMAT_IMPLEMENTATIONS: { value: string; label: string; field: { name: string; placeholder: string } }[] = [
+  { value: "ReleaseTitleSpecification", label: "Release title (regex)", field: { name: "value", placeholder: "e.g. VEVO|OFFICIAL" } },
+  { value: "ReleaseGroupSpecification", label: "Release group (regex)", field: { name: "value", placeholder: "e.g. FOOL" } },
+  { value: "IndexerFlagSpecification", label: "Indexer flag", field: { name: "flagKey", placeholder: "e.g. freeleech" } },
+  { value: "SourceSpecification", label: "Source", field: { name: "source", placeholder: "Webdl|Bluray|Hdtv|Dvd|Raw" } },
+  { value: "ResolutionSpecification", label: "Resolution", field: { name: "resolution", placeholder: "R480p|R720p|R1080p|R2160p" } },
+  { value: "LanguageSpecification", label: "Language", field: { name: "language", placeholder: "e.g. en" } },
+  { value: "SizeSpecification", label: "Size (bytes)", field: { name: "minBytes", placeholder: "minBytes" } },
+  { value: "YouTubeChannelSpecification", label: "YouTube channel", field: { name: "channel", placeholder: "UC... or channel-title substring" } },
+];
+
 export type RootFolder = {
   id: number;
   path: string;
@@ -146,6 +171,14 @@ export const api = {
     }),
   deleteQualityProfile: (id: number) =>
     call<unknown>(`/qualityprofile/${id}`, { method: "DELETE" }),
+
+  listCustomFormats: () => call<CustomFormat[]>("/customformat"),
+  createCustomFormat: (body: Omit<CustomFormat, "id">) =>
+    call<CustomFormat>("/customformat", { method: "POST", body: JSON.stringify(body) }),
+  updateCustomFormat: (id: number, body: Omit<CustomFormat, "id">) =>
+    call<CustomFormat>(`/customformat/${id}`, { method: "PUT", body: JSON.stringify(body) }),
+  deleteCustomFormat: (id: number) =>
+    call<unknown>(`/customformat/${id}`, { method: "DELETE" }),
 
   listTags: () => call<Tag[]>("/tag"),
   createTag: (label: string) =>
