@@ -8,6 +8,7 @@
   <ItemGroup>
     <ProjectReference Include="..\Vidarr.Api\Vidarr.Api.csproj" />
     <ProjectReference Include="..\Vidarr.Catalog\Vidarr.Catalog.csproj" />
+    <ProjectReference Include="..\Vidarr.ChapterSplit\Vidarr.ChapterSplit.csproj" />
     <ProjectReference Include="..\Vidarr.Contracts\Vidarr.Contracts.csproj" />
     <ProjectReference Include="..\Vidarr.Decision\Vidarr.Decision.csproj" />
     <ProjectReference Include="..\Vidarr.DownloadClients\Vidarr.DownloadClients.csproj" />

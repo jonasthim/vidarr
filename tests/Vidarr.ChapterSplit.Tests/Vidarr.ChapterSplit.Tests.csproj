@@ -1,10 +1,7 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
   <ItemGroup>
-    <ProjectReference Include="..\..\src\Vidarr.Importer\Vidarr.Importer.csproj" />
     <ProjectReference Include="..\..\src\Vidarr.ChapterSplit\Vidarr.ChapterSplit.csproj" />
-    <ProjectReference Include="..\..\src\Vidarr.Decision\Vidarr.Decision.csproj" />
-    <ProjectReference Include="..\..\src\Vidarr.Naming\Vidarr.Naming.csproj" />
     <ProjectReference Include="..\Vidarr.Tests.Common\Vidarr.Tests.Common.csproj" />
   </ItemGroup>
 
@@ -14,7 +11,6 @@
     <PackageReference Include="xunit" />
     <PackageReference Include="xunit.runner.visualstudio" />
     <PackageReference Include="FluentAssertions" />
-    <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" />
   </ItemGroup>
 
   <ItemGroup>

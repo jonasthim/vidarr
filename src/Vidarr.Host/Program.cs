@@ -48,6 +48,12 @@ builder.Services.AddSingleton<IReleaseParser, ReleaseParser>();
 builder.Services.AddSingleton<INamingService, NamingService>();
 builder.Services.AddSingleton<IImporterService, ImporterService>();
 
+// Phase 10 — chapter-aware importer.
+builder.Services.AddSingleton<Vidarr.ChapterSplit.IMediaInspector, Vidarr.ChapterSplit.MediaInspector>();
+builder.Services.AddSingleton<Vidarr.ChapterSplit.IChapterSplitter, Vidarr.ChapterSplit.ChapterSplitter>();
+builder.Services.AddSingleton<Vidarr.ChapterSplit.IChapterTitleMatcher, Vidarr.ChapterSplit.ChapterTitleMatcher>();
+builder.Services.AddSingleton<IChapterAwareImportPipeline, ChapterAwareImportPipeline>();
+
 builder.Services.AddSingleton<IYouTubeQualityMapper, YouTubeQualityMapper>();
 builder.Services.AddSingleton(new YouTubeIndexerSettings(ChannelIds: [], MaxResults: 10, RssBatchSize: 15, Timeout: TimeSpan.FromMinutes(2)));
 builder.Services.AddSingleton<IIndexer>(sp => new YouTubeIndexer(
