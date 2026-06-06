@@ -3,6 +3,7 @@
     <Project Path="src/Vidarr.Catalog/Vidarr.Catalog.csproj" />
     <Project Path="src/Vidarr.Contracts/Vidarr.Contracts.csproj" />
     <Project Path="src/Vidarr.Decision/Vidarr.Decision.csproj" />
+    <Project Path="src/Vidarr.DownloadClients/Vidarr.DownloadClients.csproj" />
     <Project Path="src/Vidarr.Indexers/Vidarr.Indexers.csproj" />
     <Project Path="src/Vidarr.Infrastructure/Vidarr.Infrastructure.csproj" />
     <Project Path="src/Vidarr.Metadata/Vidarr.Metadata.csproj" />
@@ -11,6 +12,7 @@
   <Folder Name="/tests/">
     <Project Path="tests/Vidarr.Catalog.Tests/Vidarr.Catalog.Tests.csproj" />
     <Project Path="tests/Vidarr.Decision.Tests/Vidarr.Decision.Tests.csproj" />
+    <Project Path="tests/Vidarr.DownloadClients.Tests/Vidarr.DownloadClients.Tests.csproj" />
     <Project Path="tests/Vidarr.Indexers.Tests/Vidarr.Indexers.Tests.csproj" />
     <Project Path="tests/Vidarr.Metadata.Tests/Vidarr.Metadata.Tests.csproj" />
     <Project Path="tests/Vidarr.Naming.Tests/Vidarr.Naming.Tests.csproj" />
