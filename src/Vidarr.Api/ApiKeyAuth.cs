@@ -1,6 +1,8 @@
 using System.Text.Json;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
+using Microsoft.Extensions.DependencyInjection;
+using Vidarr.Catalog.Repositories;
 
 namespace Vidarr.Api;
 
@@ -15,20 +17,35 @@ public static class ApiKeyAuth
     {
         return app.Use(async (context, next) =>
         {
-            if (!context.Request.Path.StartsWithSegments("/api"))
+            var path = context.Request.Path;
+            if (!path.StartsWithSegments("/api"))
             {
                 await next();
                 return;
             }
 
-            // /api/v1/system/status is reachable without an api key (parity with Sonarr).
-            if (context.Request.Path.StartsWithSegments("/api/v1/system/status"))
+            // Endpoints that do not require auth (parity with Sonarr):
+            //   /api/v1/system/status — used by health probes
+            //   /api/v1/auth/status   — shell decides whether to show login screen
+            //   /api/v1/auth/login    — login itself can't require an existing session
+            //   /api/v1/auth/logout   — logout clears cookies regardless of state
+            if (path.StartsWithSegments("/api/v1/system/status")
+                || path.StartsWithSegments("/api/v1/auth/status")
+                || path.StartsWithSegments("/api/v1/auth/login")
+                || path.StartsWithSegments("/api/v1/auth/logout"))
             {
                 await next();
                 return;
             }
 
             if (TryGetSubmittedKey(context, out var submitted) && string.Equals(submitted, options.ApiKey, StringComparison.Ordinal))
+            {
+                await next();
+                return;
+            }
+
+            // Cookie-session fallback when forms auth is enabled.
+            if (await TryAuthenticateCookieAsync(context))
             {
                 await next();
                 return;
@@ -55,5 +72,24 @@ public static class ApiKeyAuth
         }
         key = null;
         return false;
+    }
+
+    private static async Task<bool> TryAuthenticateCookieAsync(HttpContext ctx)
+    {
+        if (!ctx.Request.Cookies.TryGetValue(AuthEndpoints.CookieName, out var token) || string.IsNullOrEmpty(token))
+        {
+            return false;
+        }
+        var repo = ctx.RequestServices.GetService<IApplicationConfigRepository>();
+        var signer = ctx.RequestServices.GetService<ISessionSigner>();
+        if (repo is null || signer is null) return false;
+
+        var cfg = await repo.GetAsync(ctx.RequestAborted);
+        if (!string.Equals(cfg.AuthMethod, "Forms", StringComparison.OrdinalIgnoreCase)
+            || string.IsNullOrEmpty(cfg.SessionSecret))
+        {
+            return false;
+        }
+        return signer.TryVerify(cfg.SessionSecret!, token!, out _);
     }
 }

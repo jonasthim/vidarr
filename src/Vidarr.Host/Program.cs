@@ -43,6 +43,8 @@ Directory.CreateDirectory(Path.GetDirectoryName(Path.GetFullPath(sqlitePath))!);
 Directory.CreateDirectory(Path.GetFullPath(incompleteFolder));
 
 builder.Services.AddSingleton(new ApiKeyOptions(apiKey));
+builder.Services.AddSingleton<IPasswordHasher, Pbkdf2PasswordHasher>();
+builder.Services.AddSingleton<ISessionSigner, HmacSessionSigner>();
 builder.Services.AddVidarrInfrastructure();
 builder.Services.AddVidarrCatalog(sqliteConn);
 
@@ -177,6 +179,7 @@ app.MapVidarrSystemCommandApi();
 app.MapVidarrDiscoveryRuleApi();
 app.MapVidarrNotificationApi();
 app.MapVidarrHealthApi();
+app.MapVidarrAuthApi();
 
 var wwwroot = Path.Combine(builder.Environment.ContentRootPath, "wwwroot");
 if (Directory.Exists(wwwroot))

@@ -83,5 +83,12 @@ public sealed class ApplicationConfig
     public string ArtistFolderTemplate { get; set; } = "{Artist Name}";
     public string FileTemplate { get; set; } = "{Artist Name} - {Title} ({Year}) [{Quality Full}]";
 
+    // Auth (Phase 12). Method is "None" (default) or "Forms".
+    public string AuthMethod { get; set; } = "None";
+    public string? AuthUsername { get; set; }
+    public string? AuthPasswordHash { get; set; }
+    /// <summary>Base64-encoded random secret used to sign session cookies. Created on first use.</summary>
+    public string? SessionSecret { get; set; }
+
     public DateTimeOffset Updated { get; set; }
 }
