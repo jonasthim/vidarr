@@ -3,7 +3,7 @@
 **Status:** Draft (post-brainstorm)
 **Date:** 2026-06-06
 **Author:** brainstorming session with the user
-**Stack:** .NET 8 / C# backend, React + TypeScript frontend, SQLite via EF Core, ffmpeg + yt-dlp on host
+**Stack:** .NET 10 (LTS) / C# backend, React + TypeScript frontend, SQLite via EF Core 10, ffmpeg + yt-dlp on host
 
 ---
 
@@ -535,7 +535,7 @@ Tests use deterministic fakes. CI matrix runs unit + module + integration on eve
 
 ### Docker first
 
-Multi-stage Dockerfile. Final image based on `mcr.microsoft.com/dotnet/aspnet:8.0` + ffmpeg + yt-dlp + the published app. Compose example with three volumes: config, library, downloads.
+Multi-stage Dockerfile. Final image based on `mcr.microsoft.com/dotnet/aspnet:10.0` + ffmpeg + yt-dlp + the published app. Compose example with three volumes: config, library, downloads.
 
 ### Bare metal
 

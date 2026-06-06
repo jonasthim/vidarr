@@ -1,7 +1,7 @@
 # Vidarr v1 — Phased Implementation Plan
 
 **Spec:** [`docs/superpowers/specs/2026-06-06-vidarr-design.md`](../specs/2026-06-06-vidarr-design.md)
-**Stack:** .NET 8 / C# / ASP.NET Core, EF Core 8 (SQLite, WAL), React 18 + TS (Vite), Serilog, xUnit
+**Stack:** .NET 10 (LTS) / C# / ASP.NET Core, EF Core 10 (SQLite, WAL), React 18 + TS (Vite), Serilog, xUnit
 **Doctrine:** strict TDD, ~100% line coverage (95% floor), *arr-stack architecture, every external boundary behind an interface
 **Date:** 2026-06-06
 
@@ -61,13 +61,13 @@ An implementer (or Claude session) starting any later phase can answer "where do
 
 | Concern | Authoritative source (read before writing code) |
 |---|---|
-| ASP.NET Core 8 minimal APIs, IHostedService, hosting model | https://learn.microsoft.com/aspnet/core/fundamentals/?view=aspnetcore-8.0 |
+| ASP.NET Core 10 minimal APIs, IHostedService, hosting model | https://learn.microsoft.com/aspnet/core/fundamentals/?view=aspnetcore-10.0 |
 | ASP.NET Core static files / SPA hosting | https://learn.microsoft.com/aspnet/core/fundamentals/static-files |
 | `System.Threading.Channels` (`Channel<T>`) | https://learn.microsoft.com/dotnet/core/extensions/channels |
 | `System.Text.Json` source-gen + options | https://learn.microsoft.com/dotnet/standard/serialization/system-text-json |
-| EF Core 8 SQLite provider | https://learn.microsoft.com/ef/core/providers/sqlite/ |
-| EF Core 8 migrations | https://learn.microsoft.com/ef/core/managing-schemas/migrations/ |
-| EF Core 8 Owned types & value conversions | https://learn.microsoft.com/ef/core/modeling/owned-entities + https://learn.microsoft.com/ef/core/modeling/value-conversions |
+| EF Core 10 SQLite provider | https://learn.microsoft.com/ef/core/providers/sqlite/ |
+| EF Core 10 migrations | https://learn.microsoft.com/ef/core/managing-schemas/migrations/ |
+| EF Core 10 Owned types & value conversions | https://learn.microsoft.com/ef/core/modeling/owned-entities + https://learn.microsoft.com/ef/core/modeling/value-conversions |
 | xUnit | https://xunit.net/docs/getting-started/v2/netcore/cmdline |
 | FluentAssertions | https://fluentassertions.com/introduction |
 | NSubstitute | https://nsubstitute.github.io/help/getting-started/ |
@@ -193,7 +193,7 @@ From a clean checkout, `docker run` (or `dotnet run`) the app, browse to the SPA
 
 - Adding `System.Net.Http.HttpClient`, `System.IO.File`, `System.Diagnostics.Process`, `DateTime.UtcNow`, `Random`, `Environment.*` references anywhere outside `Vidarr.Infrastructure`. Use the interfaces.
 - Skipping the property-based tests for Parser/Naming — they must land in Phase 1 because they prevent entire bug classes from accruing through Phases 2–10.
-- Inventing EF Core 8 APIs from memory — open the docs, especially for JSON column mapping and Owned types decisions.
+- Inventing EF Core 10 APIs from memory — open the docs, especially for JSON column mapping and Owned types decisions.
 - Coverage gate "to be added later" — coverlet runsettings and CI threshold land in this phase or never.
 - Writing the React SPA against `fetch` directly without a typed API client — generate or hand-author TS types from `Vidarr.Contracts` DTOs.
 - Letting yt-dlp's variable stdout format leak into multiple consumers — wrap in a `YtDlpProgressParser` that `YtDlpDownloadClient` and tests share.
@@ -440,7 +440,7 @@ Hourly artist refresh discovers new IMVDb videos and adds them to Wanted; RSS sy
 
 ### Allowed APIs / docs to read first
 
-- `System.Threading.Channels`, `BackgroundService`, `PeriodicTimer` (.NET 8)
+- `System.Threading.Channels`, `BackgroundService`, `PeriodicTimer` (.NET 10)
 - Sonarr command-queue conventions (for endpoint parity)
 
 ### Anti-patterns to avoid
@@ -670,7 +670,7 @@ User sees a health page that reports broken indexers/clients/root folders/yt-dlp
 - yt-dlp updater job: HEAD/GET against yt-dlp releases, compare versions, download to temp, atomic swap, emit health-resolution event. Opt-in. Docker compose docs show separate `yt-dlp` volume.
 - Existing-library import (carryover): scan tool, parsed-name preview, batch confirm
 - Logging polish: per-module Serilog levels via config, log enrichers (artist id, video id, indexer name)
-- **Docker**: multi-stage Dockerfile based on `mcr.microsoft.com/dotnet/sdk:8.0` → publish → `mcr.microsoft.com/dotnet/aspnet:8.0` + ffmpeg + yt-dlp; sample `docker-compose.yml` with three volumes (config, library, downloads)
+- **Docker**: multi-stage Dockerfile based on `mcr.microsoft.com/dotnet/sdk:10.0` → publish → `mcr.microsoft.com/dotnet/aspnet:10.0` + ffmpeg + yt-dlp; sample `docker-compose.yml` with three volumes (config, library, downloads)
 - **CI**: extend `.github/workflows/ci.yml`: `dotnet format` lint, build, test, coverage gate (already there), Docker image build (PR + tag)
 
 ### End-of-phase deliverable
@@ -686,7 +686,7 @@ User sees a health page that reports broken indexers/clients/root folders/yt-dlp
 ### Allowed APIs / docs to read first
 
 - SQLite `PRAGMA wal_checkpoint`
-- `mcr.microsoft.com/dotnet/aspnet:8.0` image surface
+- `mcr.microsoft.com/dotnet/aspnet:10.0` image surface
 - Docker multi-stage build best practices for .NET
 - GitHub Actions matrix + `docker/build-push-action`
 
