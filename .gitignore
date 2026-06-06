@@ -13,7 +13,9 @@ coverage*.cobertura.xml
 
 # Node / Vite
 node_modules/
-dist/
+src/Vidarr.Web/dist/
+src/Vidarr.Web/tsconfig*.tsbuildinfo
+src/Vidarr.Host/wwwroot/
 *.log
 .vite/
 .cache/

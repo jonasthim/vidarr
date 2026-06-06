@@ -29,4 +29,25 @@
     <PackageReference Include="Serilog.Sinks.File" />
   </ItemGroup>
 
+  <PropertyGroup>
+    <WebDir>$(MSBuildThisFileDirectory)..\Vidarr.Web\</WebDir>
+    <WebDistDir>$(WebDir)dist\</WebDistDir>
+    <WebWwwroot>$(MSBuildThisFileDirectory)wwwroot\</WebWwwroot>
+    <SkipWebBuild Condition="'$(SkipWebBuild)' == ''">false</SkipWebBuild>
+  </PropertyGroup>
+
+  <Target Name="BuildVidarrWeb" BeforeTargets="Build" Condition="'$(SkipWebBuild)' != 'true' And Exists('$(WebDir)package.json')">
+    <Exec Command="npm install --no-audit --no-fund --silent" WorkingDirectory="$(WebDir)" Condition="!Exists('$(WebDir)node_modules')" />
+    <Exec Command="npm run build" WorkingDirectory="$(WebDir)" />
+    <ItemGroup>
+      <_WebOutput Include="$(WebDistDir)**\*.*" />
+    </ItemGroup>
+    <RemoveDir Directories="$(WebWwwroot)" Condition="Exists('$(WebWwwroot)')" />
+    <Copy SourceFiles="@(_WebOutput)" DestinationFiles="@(_WebOutput->'$(WebWwwroot)%(RecursiveDir)%(Filename)%(Extension)')" />
+  </Target>
+
+  <ItemGroup>
+    <Content Include="wwwroot\**\*.*" CopyToOutputDirectory="PreserveNewest" Condition="Exists('wwwroot')" />
+  </ItemGroup>
+
 </Project>

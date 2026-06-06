@@ -1,0 +1,116 @@
+:root {
+  color-scheme: dark;
+  font-family: ui-sans-serif, system-ui, -apple-system, sans-serif;
+  background: #14161a;
+  color: #e2e6ec;
+}
+
+body, #root, .app {
+  margin: 0;
+  min-height: 100vh;
+}
+
+.topbar {
+  display: flex;
+  align-items: center;
+  gap: 2rem;
+  padding: 1rem 1.5rem;
+  border-bottom: 1px solid #2a2f37;
+  background: #1c2026;
+}
+
+.topbar h1 {
+  margin: 0;
+  font-size: 1.4rem;
+  letter-spacing: 0.04em;
+  color: #6aa9ff;
+}
+
+.topbar nav button {
+  background: none;
+  border: none;
+  color: inherit;
+  padding: 0.4rem 0.8rem;
+  border-radius: 6px;
+  cursor: pointer;
+  font: inherit;
+}
+
+.topbar nav button.active {
+  background: #283041;
+  color: #fff;
+}
+
+main {
+  padding: 1.5rem;
+}
+
+form label {
+  display: block;
+  margin-bottom: 0.75rem;
+}
+
+form input, form button {
+  display: block;
+  margin-top: 0.25rem;
+  font: inherit;
+  padding: 0.4rem 0.6rem;
+  border-radius: 6px;
+  border: 1px solid #2a2f37;
+  background: #1c2026;
+  color: inherit;
+}
+
+form button {
+  background: #345099;
+  color: #fff;
+  border: none;
+  cursor: pointer;
+}
+
+form button:disabled {
+  opacity: 0.5;
+  cursor: progress;
+}
+
+.results, .artists ul, .videos ul {
+  list-style: none;
+  padding: 0;
+}
+
+.results li, .artists li, .videos li {
+  padding: 0.6rem 0.8rem;
+  border-bottom: 1px solid #2a2f37;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  cursor: pointer;
+}
+
+.artists li.selected {
+  background: #283041;
+}
+
+.library {
+  display: grid;
+  grid-template-columns: 1fr 2fr;
+  gap: 1.5rem;
+}
+
+.queue table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.queue th, .queue td {
+  text-align: left;
+  padding: 0.5rem;
+  border-bottom: 1px solid #2a2f37;
+}
+
+.error {
+  background: #3a1d20;
+  padding: 0.6rem;
+  border-radius: 6px;
+  margin: 0.6rem 0;
+}

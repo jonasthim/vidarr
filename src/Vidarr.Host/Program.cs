@@ -77,6 +77,14 @@ using (var scope = app.Services.CreateScope())
 app.UseApiKeyAuth(new ApiKeyOptions(apiKey));
 app.MapVidarrApi();
 
+var wwwroot = Path.Combine(builder.Environment.ContentRootPath, "wwwroot");
+if (Directory.Exists(wwwroot))
+{
+    app.UseDefaultFiles();
+    app.UseStaticFiles();
+    app.MapFallbackToFile("index.html");
+}
+
 Log.Information("Vidarr starting on {Url}", string.Join(",", app.Urls.Count > 0 ? app.Urls : ["default"]));
 Log.Information("Vidarr API key: {Key}", apiKey);
 
