@@ -2,6 +2,7 @@ using System.Diagnostics.CodeAnalysis;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Vidarr.Catalog.Repositories;
+using Vidarr.Catalog.Seeding;
 
 namespace Vidarr.Catalog;
 
@@ -15,6 +16,17 @@ public static class CatalogServiceCollectionExtensions
         services.AddScoped<IMusicVideoRepository, MusicVideoRepository>();
         services.AddScoped<IMusicVideoFileRepository, MusicVideoFileRepository>();
         services.AddScoped<IRootFolderRepository, RootFolderRepository>();
+        services.AddScoped<ITagRepository, TagRepository>();
+        services.AddScoped<IQualityProfileRepository, QualityProfileRepository>();
+        services.AddScoped<ICustomFormatRepository, CustomFormatRepository>();
+        services.AddScoped<IBlocklistRepository, BlocklistRepository>();
+        services.AddScoped<IHistoryRepository, HistoryRepository>();
+        services.AddScoped<IIndexerConfigRepository, IndexerConfigRepository>();
+        services.AddScoped<IDownloadClientConfigRepository, DownloadClientConfigRepository>();
+        services.AddScoped<INotificationConfigRepository, NotificationConfigRepository>();
+        services.AddScoped<IDiscoveryRuleSetRepository, DiscoveryRuleSetRepository>();
+        services.AddScoped<IApplicationConfigRepository, ApplicationConfigRepository>();
+        services.AddSingleton<IDataSeeder, DataSeeder>();
         return services;
     }
 }
