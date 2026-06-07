@@ -50,14 +50,20 @@ public static class Endpoints
             {
                 Name = details.Name,
                 SortName = details.SortName ?? details.Name,
+                Disambiguation = details.Disambiguation,
                 Country = details.Country,
                 ExternalIdsJson = System.Text.Json.JsonSerializer.Serialize(details.ExternalIds),
                 YouTubeChannelIdsJson = System.Text.Json.JsonSerializer.Serialize(details.YouTubeChannelIds),
+                GenresJson = System.Text.Json.JsonSerializer.Serialize(details.Genres),
+                AliasesJson = System.Text.Json.JsonSerializer.Serialize(details.Aliases),
+                ImagesJson = System.Text.Json.JsonSerializer.Serialize(
+                    details.Images.Select(i => new { kind = i.Kind, url = i.Url.AbsoluteUri }).ToArray()),
                 Monitored = true,
                 MonitorMode = req.MonitorMode,
                 QualityProfileId = req.QualityProfileId,
                 RootFolderPath = req.RootFolderPath,
                 Added = DateTimeOffset.UtcNow,
+                LastInfoSync = DateTimeOffset.UtcNow,
             };
 
             var created = await artists.AddAsync(artist, ct);
@@ -74,6 +80,18 @@ public static class Endpoints
         {
             var artist = await artists.GetAsync(id, ct);
             return artist is null ? Results.NotFound() : Results.Ok(ToDto(artist));
+        });
+
+        v1.MapGet("/artist/{id:int}/details", async (
+            int id,
+            IArtistRepository artists,
+            IMusicVideoRepository videos,
+            CancellationToken ct) =>
+        {
+            var artist = await artists.GetAsync(id, ct);
+            if (artist is null) return Results.NotFound();
+            var artistVideos = await videos.ListByArtistAsync(id, ct);
+            return Results.Ok(ToDetailsDto(artist, artistVideos));
         });
 
         v1.MapPut("/artist/{id:int}/youtube-channels", async (
@@ -198,9 +216,29 @@ public static class Endpoints
     }
 
     internal static ArtistDto ToDto(Artist a) =>
-        new(a.Id, a.Name, a.SortName, a.Country, a.Monitored, a.MonitorMode, a.RootFolderPath, a.Added, ParseChannelIds(a.YouTubeChannelIdsJson));
+        new(
+            a.Id,
+            a.Name,
+            a.SortName,
+            a.Disambiguation,
+            a.Country,
+            a.Monitored,
+            a.MonitorMode,
+            a.RootFolderPath,
+            a.Added,
+            a.LastInfoSync,
+            ParseStringArray(a.YouTubeChannelIdsJson),
+            ParseStringArray(a.GenresJson),
+            ParseImages(a.ImagesJson));
 
-    private static string[] ParseChannelIds(string json)
+    internal static ArtistDetailsDto ToDetailsDto(Artist a, IReadOnlyList<MusicVideo> videos) =>
+        new(
+            ToDto(a),
+            ParseStringArray(a.AliasesJson),
+            videos.Count,
+            videos.Count(v => v.HasFile));
+
+    private static string[] ParseStringArray(string json)
     {
         try
         {
@@ -212,6 +250,43 @@ public static class Endpoints
         }
     }
 
+    private static readonly System.Text.Json.JsonSerializerOptions _imageJsonOpts =
+        new() { PropertyNameCaseInsensitive = true };
+
+    private static ArtistImageDto[] ParseImages(string json)
+    {
+        try
+        {
+            var raw = System.Text.Json.JsonSerializer.Deserialize<ArtistImageRaw[]>(json, _imageJsonOpts);
+            if (raw is null) return [];
+            return [.. raw
+                .Where(i => !string.IsNullOrEmpty(i.Url))
+                .Select(i => new ArtistImageDto(i.Kind ?? "unknown", i.Url!))];
+        }
+        catch (System.Text.Json.JsonException)
+        {
+            return [];
+        }
+    }
+
+    private sealed class ArtistImageRaw
+    {
+        public string? Kind { get; set; }
+        public string? Url { get; set; }
+    }
+
     internal static MusicVideoDto ToDto(MusicVideo v) =>
-        new(v.Id, v.ArtistId, v.Title, v.Year, v.Type, v.Monitored, v.HasFile);
+        new(
+            v.Id,
+            v.ArtistId,
+            v.Title,
+            v.Year,
+            v.ReleaseDate,
+            v.Type,
+            v.Director,
+            v.Runtime is { } r ? (int)r.TotalSeconds : null,
+            v.ThumbnailUrl,
+            v.Monitored,
+            v.HasFile,
+            ParseStringArray(v.GenresJson));
 }

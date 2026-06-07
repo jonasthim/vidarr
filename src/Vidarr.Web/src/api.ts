@@ -8,16 +8,29 @@ export type ArtistLookupResult = {
   thumbnailUrl?: string;
 };
 
+export type ArtistImage = { kind: string; url: string };
+
 export type ArtistDto = {
   id: number;
   name: string;
   sortName: string;
+  disambiguation?: string | null;
   country?: string;
   monitored: boolean;
   monitorMode: string;
   rootFolderPath: string;
   added: string;
+  lastInfoSync?: string | null;
   youTubeChannelIds: string[];
+  genres: string[];
+  images: ArtistImage[];
+};
+
+export type ArtistDetailsDto = {
+  artist: ArtistDto;
+  aliases: string[];
+  videoCount: number;
+  downloadedCount: number;
 };
 
 export type MusicVideoDto = {
@@ -25,9 +38,14 @@ export type MusicVideoDto = {
   artistId: number;
   title: string;
   year?: number;
+  releaseDate?: string | null;
   type: string;
+  director?: string | null;
+  runtimeSeconds?: number | null;
+  thumbnailUrl?: string | null;
   monitored: boolean;
   hasFile: boolean;
+  genres: string[];
 };
 
 export type QueueItem = {
@@ -218,6 +236,8 @@ export const api = {
       }),
     }),
   listArtists: () => call<ArtistDto[]>("/artist"),
+  getArtist: (id: number) => call<ArtistDto>(`/artist/${id}`),
+  getArtistDetails: (id: number) => call<ArtistDetailsDto>(`/artist/${id}/details`),
   listMusicVideos: (artistId: number) =>
     call<MusicVideoDto[]>(`/musicvideo?artistId=${artistId}`),
   triggerArtistSearch: (artistId: number) =>

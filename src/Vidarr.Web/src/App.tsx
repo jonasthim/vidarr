@@ -9,7 +9,7 @@ import { WantedPlaceholder } from "./pages/WantedPlaceholder";
 import { SettingsPage } from "./pages/Settings";
 import { SystemPage } from "./pages/System";
 import { LoginPage } from "./pages/Login";
-import { ArtistDetailStub } from "./pages/ArtistDetailStub";
+import { ArtistDetail } from "./pages/ArtistDetail";
 
 export function App(): JSX.Element {
   return (
@@ -19,7 +19,7 @@ export function App(): JSX.Element {
         <Route element={<Layout />}>
           <Route index element={<Navigate to="/library" replace />} />
           <Route path="library" element={<LibraryPage />} />
-          <Route path="library/:artistId" element={<ArtistDetailStub />} />
+          <Route path="library/:artistId" element={<ArtistDetail />} />
           <Route path="add" element={<AddArtistPage />} />
           <Route path="calendar" element={<CalendarPlaceholder />} />
           <Route path="activity">

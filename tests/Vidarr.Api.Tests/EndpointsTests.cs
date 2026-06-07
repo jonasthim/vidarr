@@ -147,6 +147,59 @@ public class EndpointsTests : IDisposable
     }
 
     [Fact]
+    public async Task Added_artist_surfaces_disambiguation_genres_and_images()
+    {
+        _metadata.ArtistDetails = new ArtistDetails(
+            ProviderId: "42", Name: "Imagic", SortName: "Imagic",
+            Disambiguation: "the band, not the magician",
+            Aliases: ["Imagic NL"], Genres: ["electronic", "shoegaze"], Country: "NL",
+            YearsActiveStart: 2010, YearsActiveEnd: null,
+            Images: [
+                new ArtistImage("poster", new Uri("https://example.com/poster.jpg")),
+                new ArtistImage("banner", new Uri("https://example.com/banner.jpg")),
+            ],
+            ExternalIds: new Dictionary<string, string> { ["imvdb"] = "42" },
+            YouTubeChannelIds: []);
+        var addReq = new AddArtistRequest("imvdb", "42", "/library", 1, MonitorMode.All);
+        var added = await (await _client.PostAsJsonAsync(new Uri("http://localhost/api/v1/artist"), addReq))
+            .Content.ReadFromJsonAsync<ArtistDto>();
+        added!.Disambiguation.Should().Be("the band, not the magician");
+        added.Genres.Should().BeEquivalentTo(["electronic", "shoegaze"]);
+        added.Images.Should().HaveCount(2);
+        added.Images.Should().Contain(i => i.Kind == "poster" && i.Url.EndsWith("poster.jpg"));
+    }
+
+    [Fact]
+    public async Task Artist_details_endpoint_returns_aliases_and_counts()
+    {
+        _metadata.ArtistDetails = new ArtistDetails(
+            ProviderId: "7", Name: "Det", SortName: "Det",
+            Disambiguation: null,
+            Aliases: ["Det", "Det Lab"], Genres: [], Country: null,
+            YearsActiveStart: null, YearsActiveEnd: null, Images: [],
+            ExternalIds: new Dictionary<string, string> { ["imvdb"] = "7" },
+            YouTubeChannelIds: []);
+        var created = await (await _client.PostAsJsonAsync(new Uri("http://localhost/api/v1/artist"),
+            new AddArtistRequest("imvdb", "7", "/library", 1, MonitorMode.All)))
+            .Content.ReadFromJsonAsync<ArtistDto>();
+
+        var resp = await _client.GetAsync(new Uri($"http://localhost/api/v1/artist/{created!.Id}/details"));
+        resp.StatusCode.Should().Be(HttpStatusCode.OK);
+        var dto = await resp.Content.ReadFromJsonAsync<ArtistDetailsDto>();
+        dto!.Aliases.Should().BeEquivalentTo(["Det", "Det Lab"]);
+        dto.VideoCount.Should().Be(0);
+        dto.DownloadedCount.Should().Be(0);
+        dto.Artist.Name.Should().Be("Det");
+    }
+
+    [Fact]
+    public async Task Artist_details_returns_404_for_unknown_id()
+    {
+        var resp = await _client.GetAsync(new Uri("http://localhost/api/v1/artist/424242/details"));
+        resp.StatusCode.Should().Be(HttpStatusCode.NotFound);
+    }
+
+    [Fact]
     public async Task List_music_videos_without_artist_id_returns_400()
     {
         var resp = await _client.GetAsync(new Uri("http://localhost/api/v1/musicvideo"));

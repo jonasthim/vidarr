@@ -13,13 +13,48 @@ public sealed record ArtistLookupResult(string ProviderId, string Name, string? 
 public sealed record AddArtistRequest(string Provider, string ProviderId, string RootFolderPath, int QualityProfileId, MonitorMode MonitorMode);
 
 [ExcludeFromCodeCoverage(Justification = "Plain transport DTOs.")]
-public sealed record ArtistDto(int Id, string Name, string SortName, string? Country, bool Monitored, MonitorMode MonitorMode, string RootFolderPath, DateTimeOffset Added, IReadOnlyList<string> YouTubeChannelIds);
+public sealed record ArtistImageDto(string Kind, string Url);
+
+[ExcludeFromCodeCoverage(Justification = "Plain transport DTOs.")]
+public sealed record ArtistDto(
+    int Id,
+    string Name,
+    string SortName,
+    string? Disambiguation,
+    string? Country,
+    bool Monitored,
+    MonitorMode MonitorMode,
+    string RootFolderPath,
+    DateTimeOffset Added,
+    DateTimeOffset? LastInfoSync,
+    IReadOnlyList<string> YouTubeChannelIds,
+    IReadOnlyList<string> Genres,
+    IReadOnlyList<ArtistImageDto> Images);
+
+[ExcludeFromCodeCoverage(Justification = "Plain transport DTOs.")]
+public sealed record ArtistDetailsDto(
+    ArtistDto Artist,
+    IReadOnlyList<string> Aliases,
+    int VideoCount,
+    int DownloadedCount);
 
 [ExcludeFromCodeCoverage(Justification = "Plain transport DTOs.")]
 public sealed record YouTubeChannelsRequest(IReadOnlyList<string> ChannelIds);
 
 [ExcludeFromCodeCoverage(Justification = "Plain transport DTOs.")]
-public sealed record MusicVideoDto(int Id, int ArtistId, string Title, int? Year, MusicVideoType Type, bool Monitored, bool HasFile);
+public sealed record MusicVideoDto(
+    int Id,
+    int ArtistId,
+    string Title,
+    int? Year,
+    DateTimeOffset? ReleaseDate,
+    MusicVideoType Type,
+    string? Director,
+    int? RuntimeSeconds,
+    string? ThumbnailUrl,
+    bool Monitored,
+    bool HasFile,
+    IReadOnlyList<string> Genres);
 
 [ExcludeFromCodeCoverage(Justification = "Plain transport DTOs.")]
 public sealed record CommandRequest(string Name, int? ArtistId, int? MusicVideoId);
