@@ -83,6 +83,11 @@ public sealed class ApplicationConfig
     public string ArtistFolderTemplate { get; set; } = "{Artist Name}";
     public string FileTemplate { get; set; } = "{Artist Name} - {Title} ({Year}) [{Quality Full}]";
 
+    // Persisted REST API key. Sonarr/Radarr parity: generated on first boot,
+    // displayed + rotatable through the Settings UI. Env var VIDARR_API_KEY and
+    // appsettings:Vidarr:ApiKey still override this when set.
+    public string? ApiKey { get; set; }
+
     // yt-dlp updater (Phase 13). Opt-in.
     public bool YtDlpAutoUpdate { get; set; }
     public string YtDlpBinaryPath { get; set; } = "yt-dlp";

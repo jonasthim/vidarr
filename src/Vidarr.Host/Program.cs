@@ -33,7 +33,11 @@ builder.Host.UseSerilog((ctx, lc) => lc
     .WriteTo.File(Path.Combine(ctx.HostingEnvironment.ContentRootPath, "data", "logs", "vidarr-.log"), rollingInterval: RollingInterval.Day));
 
 var config = builder.Configuration;
-var apiKey = Environment.GetEnvironmentVariable("VIDARR_API_KEY") ?? config["Vidarr:ApiKey"] ?? Guid.NewGuid().ToString("N");
+// API key resolution: env / appsettings is an *override* — when set, the
+// operator owns the value and it cannot be rotated through the UI. Otherwise
+// ApiKeyService reads (and on first boot generates+persists) the value in
+// ApplicationConfig so it survives restarts and is rotatable from Settings.
+var apiKeyOverride = Environment.GetEnvironmentVariable("VIDARR_API_KEY") ?? config["Vidarr:ApiKey"];
 var sqlitePath = Environment.GetEnvironmentVariable("VIDARR_SQLITE_PATH") ?? config["Vidarr:Sqlite:Path"] ?? "data/vidarr.db";
 var backupFolder = Environment.GetEnvironmentVariable("VIDARR_BACKUP_FOLDER") ?? config["Vidarr:Backup:Folder"] ?? "data/backups";
 var backupRetention = int.TryParse(config["Vidarr:Backup:Retention"], out var r) ? r : 10;
@@ -54,7 +58,8 @@ if (Vidarr.Backup.RestoreBootstrap.ApplyPendingRestore(
     Log.Information("Applied staged backup restore on startup");
 }
 
-builder.Services.AddSingleton(new ApiKeyOptions(apiKey));
+builder.Services.AddSingleton(new ApiKeyOverride(apiKeyOverride));
+builder.Services.AddSingleton<IApiKeyService, ApiKeyService>();
 builder.Services.AddSingleton<IPasswordHasher, Pbkdf2PasswordHasher>();
 builder.Services.AddSingleton<ISessionSigner, HmacSessionSigner>();
 builder.Services.AddVidarrInfrastructure();
@@ -201,7 +206,7 @@ using (var scope = app.Services.CreateScope())
     await seeder.SeedAsync(db, default);
 }
 
-app.UseApiKeyAuth(new ApiKeyOptions(apiKey));
+app.UseApiKeyAuth();
 app.MapVidarrApi();
 app.MapVidarrSettingsApi();
 app.MapVidarrReleaseApi();
@@ -212,17 +217,30 @@ app.MapVidarrNotificationApi();
 app.MapVidarrHealthApi();
 app.MapVidarrAuthApi();
 app.MapVidarrBackupApi();
+app.MapVidarrApiKeyApi();
 
 var wwwroot = Path.Combine(builder.Environment.ContentRootPath, "wwwroot");
 if (Directory.Exists(wwwroot))
 {
-    app.UseDefaultFiles();
+    // Serve static assets normally, but render index.html through a handler
+    // that substitutes the %VIDARR_API_KEY% placeholder with the current
+    // (potentially-rotated) value from IApiKeyService.
+    var indexHandler = new Vidarr.Host.IndexHtmlHandler(Path.Combine(wwwroot, "index.html"));
     app.UseStaticFiles();
-    app.MapFallbackToFile("index.html");
+    if (indexHandler.Exists())
+    {
+        app.MapFallback(async (HttpContext ctx, IApiKeyService keyService) =>
+            await (await indexHandler.RenderAsync(keyService, ctx.RequestAborted)).ExecuteAsync(ctx));
+    }
 }
 
 Log.Information("Vidarr starting on {Url}", string.Join(",", app.Urls.Count > 0 ? app.Urls : ["default"]));
-Log.Information("Vidarr API key: {Key}", apiKey);
+using (var scope = app.Services.CreateScope())
+{
+    var keyService = scope.ServiceProvider.GetRequiredService<IApiKeyService>();
+    var startupKey = await keyService.GetCurrentAsync(default);
+    Log.Information("Vidarr API key: {Key}", startupKey);
+}
 
 await app.RunAsync();
 

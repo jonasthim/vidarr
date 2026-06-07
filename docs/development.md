@@ -83,15 +83,18 @@ cd src/Vidarr.Web
 VIDARR_API_KEY=dev-key npm run dev
 ```
 
-## API auth in dev
+## API auth
 
-The SPA reads `window.VIDARR_API_KEY` on boot (`src/Vidarr.Web/src/api.ts:1`). Three things hand it a value:
+The REST API key is **persisted in the DB** and auto-generated on first boot (Sonarr/Radarr parity). It's exposed in the web UI under **Settings → Security**, where it can be revealed, copied, or regenerated. Setting `VIDARR_API_KEY` in the environment (or `Vidarr:ApiKey` in appsettings) pins the value at boot and disables the Regenerate button.
 
-1. **`appsettings.Development.json`** locks the backend's API key to `dev-key`.
-2. **`vite.config.ts`** has a `transformIndexHtml` plugin that replaces `%VIDARR_API_KEY%` in `index.html` with the value of `process.env.VIDARR_API_KEY` (defaults to `dev-key`).
-3. **`scripts/dev.sh`** exports `VIDARR_API_KEY=dev-key` to both processes, so they always agree.
+### How the SPA gets the key
 
-If you set `VIDARR_API_KEY` to something else in your shell, both sides honour it.
+The SPA reads `window.VIDARR_API_KEY` on boot (`src/Vidarr.Web/src/api.ts:1`). It's injected into `index.html` in two different ways:
+
+- **Production** — the .NET host serves `index.html` through `IndexHtmlHandler`, which reads the live key from `IApiKeyService` and substitutes `%VIDARR_API_KEY%` at request time. Rotations take effect immediately on the next page load.
+- **Dev** — `vite.config.ts` substitutes the placeholder at Vite-dev-server start with `process.env.VIDARR_API_KEY` (defaults to `dev-key`).
+
+For `make dev`, the dev appsettings locks the backend's key to `dev-key`, and `scripts/dev.sh` exports the same value to both processes, so they always agree without any per-machine setup. Set `VIDARR_API_KEY` in your shell to override.
 
 ## Sample data
 

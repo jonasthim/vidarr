@@ -264,3 +264,39 @@ table.grid td {
 .topbar .logout {
   margin-left: auto;
 }
+
+.security-row {
+  display: grid;
+  gap: 0.75rem;
+  max-width: 640px;
+  margin-top: 1rem;
+}
+
+.security-row label {
+  display: grid;
+  gap: 0.3rem;
+}
+
+.security-row input {
+  padding: 0.5rem 0.6rem;
+  background: #1c2026;
+  border: 1px solid #2a2f37;
+  color: #e7ecf2;
+  border-radius: 6px;
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+}
+
+.security-actions {
+  display: flex;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+}
+
+.security-actions button.danger {
+  background: #5a1d1d;
+  color: #ffd1d1;
+}
+
+.security-actions button.danger:hover:not(:disabled) {
+  background: #6b2424;
+}

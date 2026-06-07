@@ -9,9 +9,11 @@ import { CustomFormatsPanel } from "../components/CustomFormatsPanel";
 import { BlocklistPanel } from "../components/BlocklistPanel";
 import { DiscoveryRulesPanel } from "../components/DiscoveryRulesPanel";
 import { NotificationsPanel } from "../components/NotificationsPanel";
+import { SecurityPanel } from "../components/SecurityPanel";
 
 type Pane =
   | "general"
+  | "security"
   | "profiles"
   | "customformats"
   | "rootfolders"
@@ -32,6 +34,7 @@ export function SettingsPage(): JSX.Element {
           {(
             [
               ["general", "Media Management"],
+              ["security", "Security"],
               ["profiles", "Quality Profiles"],
               ["customformats", "Custom Formats"],
               ["indexers", "Indexers"],
@@ -60,6 +63,7 @@ export function SettingsPage(): JSX.Element {
       </aside>
       <div className="settings-pane">
         {pane === "general" && <GeneralSettingsPanel />}
+        {pane === "security" && <SecurityPanel />}
         {pane === "profiles" && <ProfilesPanel />}
         {pane === "customformats" && <CustomFormatsPanel />}
         {pane === "indexers" && <IndexersPanel />}

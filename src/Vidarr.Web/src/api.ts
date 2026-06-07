@@ -361,6 +361,11 @@ export const api = {
   listHistory: (artistId?: number) =>
     call<HistoryItem[]>(`/history${artistId ? `?artistId=${artistId}` : ""}`),
 
+  // api key (sonarr-style: persisted, rotatable from Settings)
+  getApiKey: () => call<{ apiKey: string }>("/system/apikey"),
+  rotateApiKey: () =>
+    call<{ apiKey: string }>("/system/apikey/rotate", { method: "POST" }),
+
   // auth
   getAuthStatus: () => call<AuthStatus>("/auth/status"),
   login: (username: string, password: string) =>

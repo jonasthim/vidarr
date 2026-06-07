@@ -38,7 +38,7 @@ Every setting is overridable by env var. The fallback chain is `env var → apps
 
 | Env var                  | `appsettings.json` key       | Default              | Purpose                          |
 | ------------------------ | ---------------------------- | -------------------- | -------------------------------- |
-| `VIDARR_API_KEY`         | `Vidarr:ApiKey`              | random per boot      | REST API key (`X-Api-Key` header)|
+| `VIDARR_API_KEY`         | `Vidarr:ApiKey`              | auto on first boot   | REST API key (`X-Api-Key` header) — see Auth below |
 | `VIDARR_SQLITE_PATH`     | `Vidarr:Sqlite:Path`         | `data/vidarr.db`     | Path to the SQLite file          |
 | `VIDARR_BACKUP_FOLDER`   | `Vidarr:Backup:Folder`       | `data/backups`       | Directory for zipped backups     |
 | —                        | `Vidarr:Backup:Retention`    | `10`                 | Number of backups to keep        |
@@ -47,6 +47,10 @@ Every setting is overridable by env var. The fallback chain is `env var → apps
 | `VIDARR_YTDLP_PATH`      | `Vidarr:YtDlp:Path`          | `yt-dlp`             | Path to the yt-dlp binary        |
 
 Per-namespace log levels live under `Serilog:MinimumLevel:Override` in [`src/Vidarr.Host/appsettings.json`](src/Vidarr.Host/appsettings.json).
+
+### Auth
+
+The REST API key is generated on first boot and persisted in the SQLite DB (Sonarr/Radarr parity). It survives restarts and can be regenerated from **Settings → Security** in the web UI. Setting `VIDARR_API_KEY` env var (or `Vidarr:ApiKey` in appsettings) pins the value at boot and disables UI rotation — useful when the operator wants the value locked in by their orchestration. Optional forms login (username + password) is a parallel mechanism configured via `PUT /api/v1/auth/config`.
 
 ## Architecture
 

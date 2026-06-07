@@ -11,21 +11,21 @@ export default defineConfig(({ mode }) => {
 
   const backendPort = Number(env.VIDARR_DEV_BACKEND_PORT) || DEFAULT_BACKEND_PORT;
   const frontendPort = Number(env.VIDARR_DEV_FRONTEND_PORT) || DEFAULT_FRONTEND_PORT;
-  // Default to "dev-key" so a bare `npm run dev` (no env) still matches the
-  // dev appsettings.Development.json fixed key.
-  const apiKey = env.VIDARR_API_KEY ?? "dev-key";
+  const isDev = mode !== "production";
+  const devApiKey = env.VIDARR_API_KEY ?? "dev-key";
 
   return {
     plugins: [
       react(),
       {
-        // Inject the dev API key into index.html so the SPA's
-        // window.VIDARR_API_KEY reader (src/api.ts) picks it up without any
-        // per-machine config. In production the placeholder is replaced with
-        // empty string by `vite build`.
+        // In dev: inject the key so the SPA can authenticate without any
+        // per-machine setup.
+        // In production: leave the %VIDARR_API_KEY% placeholder verbatim so
+        // the .NET host's IndexHtmlHandler can substitute it at request time
+        // with the live (DB-persisted, rotatable) value.
         name: "vidarr-inject-api-key",
         transformIndexHtml(html) {
-          return html.replace(/%VIDARR_API_KEY%/g, apiKey);
+          return isDev ? html.replace(/%VIDARR_API_KEY%/g, devApiKey) : html;
         },
       },
     ],
