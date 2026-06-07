@@ -2,6 +2,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\..\src\Vidarr.Scheduler\Vidarr.Scheduler.csproj" />
+    <ProjectReference Include="..\Vidarr.Tests.Common\Vidarr.Tests.Common.csproj" />
   </ItemGroup>
 
   <ItemGroup>

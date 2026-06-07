@@ -114,6 +114,7 @@ public sealed class RecurringJobRunner : IRecurringJobRunner
             return;
         }
 
+        using var scope = _logger.BeginScope(new Dictionary<string, object> { ["JobName"] = job.Name });
         _history.RecordStart(job.Name, _clock.UtcNow);
         try
         {
