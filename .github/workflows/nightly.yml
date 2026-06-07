@@ -1,0 +1,96 @@
+name: Nightly
+
+on:
+  schedule:
+    # 03:17 UTC — off-peak; small jitter from the round hour to dodge GH cron pile-ups.
+    - cron: '17 3 * * *'
+  workflow_dispatch:
+
+env:
+  DOTNET_NOLOGO: true
+  DOTNET_SKIP_FIRST_TIME_EXPERIENCE: true
+  DOTNET_CLI_TELEMETRY_OPTOUT: true
+
+permissions:
+  contents: read
+
+jobs:
+  full-suite:
+    name: Full test suite + smoke
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup .NET 10
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '10.0.x'
+
+      - name: Restore
+        run: dotnet restore
+
+      - name: Build
+        run: dotnet build --no-restore --configuration Release
+
+      - name: Run full suite with coverage
+        run: |
+          dotnet test --no-build --configuration Release \
+            --settings build/coverlet.runsettings \
+            --collect:"XPlat Code Coverage" \
+            --results-directory ./TestResults \
+            --logger "trx;LogFileName=test-results.trx"
+
+      - name: Run smoke tests (in-process vertical)
+        run: dotnet test tests/Vidarr.SmokeTests/Vidarr.SmokeTests.csproj --no-build --configuration Release --logger "console;verbosity=normal"
+
+      - name: Upload TRX
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: nightly-test-results
+          path: ./TestResults/**/*.trx
+
+  docker-smoke:
+    name: Docker image smoke (linux/amd64 + linux/arm64)
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        platform: [linux/amd64, linux/arm64]
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up QEMU
+        uses: docker/setup-qemu-action@v3
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Build image for ${{ matrix.platform }}
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          file: ./Dockerfile
+          platforms: ${{ matrix.platform }}
+          load: true
+          tags: vidarr:nightly
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+
+      - name: Run container and probe /api/v1/system/status
+        env:
+          PLATFORM: ${{ matrix.platform }}
+        run: |
+          docker run -d --name vidarr-nightly --platform "$PLATFORM" \
+            -p 18989:8989 -e VIDARR_API_KEY=nightly vidarr:nightly
+          ok=0
+          for i in $(seq 1 30); do
+            if curl -fsS http://localhost:18989/api/v1/system/status > /tmp/status.json; then
+              ok=1; break
+            fi
+            sleep 2
+          done
+          cat /tmp/status.json || true
+          docker logs vidarr-nightly || true
+          docker rm -f vidarr-nightly || true
+          [ "$ok" = "1" ] && grep -q '"version"' /tmp/status.json

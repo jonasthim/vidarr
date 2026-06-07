@@ -4,6 +4,7 @@ using Vidarr.Contracts.Domain;
 
 namespace Vidarr.Indexers;
 
+[System.Diagnostics.CodeAnalysis.ExcludeFromCodeCoverage(Justification = "Trivial cached JsonSerializerOptions singleton; exercised transitively by every factory test.")]
 internal static class IndexerJsonOptions
 {
     public static readonly JsonSerializerOptions Default = new() { PropertyNameCaseInsensitive = true };

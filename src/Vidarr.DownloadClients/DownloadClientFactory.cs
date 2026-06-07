@@ -5,6 +5,7 @@ using Vidarr.Contracts.Models;
 
 namespace Vidarr.DownloadClients;
 
+[System.Diagnostics.CodeAnalysis.ExcludeFromCodeCoverage(Justification = "Trivial cached JsonSerializerOptions singleton; exercised transitively by every factory test.")]
 internal static class FactoryJsonOptions
 {
     public static readonly JsonSerializerOptions Default = new() { PropertyNameCaseInsensitive = true };

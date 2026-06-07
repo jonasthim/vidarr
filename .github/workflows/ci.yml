@@ -112,12 +112,57 @@ jobs:
             type=semver,pattern={{major}}.{{minor}}
             type=sha,prefix=sha-
 
-      - name: Build (and push on push events)
+      - name: Decide platforms
+        id: platforms
+        env:
+          REF_TYPE: ${{ github.ref_type }}
+        run: |
+          # PR / branch pushes: amd64 only (fast iteration).
+          # Tag pushes (releases): amd64 + arm64.
+          if [ "$REF_TYPE" = "tag" ]; then
+            echo "list=linux/amd64,linux/arm64" >> "$GITHUB_OUTPUT"
+          else
+            echo "list=linux/amd64" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Build image (load locally for smoke)
         uses: docker/build-push-action@v6
         with:
           context: .
           file: ./Dockerfile
           platforms: linux/amd64
+          load: true
+          tags: vidarr:ci
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+
+      - name: Smoke — run container and probe /api/v1/system/status
+        run: |
+          docker run -d --name vidarr-ci -p 18989:8989 \
+            -e VIDARR_API_KEY=ci-smoke vidarr:ci
+          for i in 1 2 3 4 5 6 7 8 9 10 11 12; do
+            if curl -fsS http://localhost:18989/api/v1/system/status > /tmp/status.json; then
+              break
+            fi
+            sleep 2
+          done
+          cat /tmp/status.json
+          grep -q '"version"' /tmp/status.json
+
+      - name: Capture container logs
+        if: always()
+        run: docker logs vidarr-ci || true
+
+      - name: Stop container
+        if: always()
+        run: docker rm -f vidarr-ci || true
+
+      - name: Build (and push on push events) for target platforms
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          file: ./Dockerfile
+          platforms: ${{ steps.platforms.outputs.list }}
           push: ${{ github.event_name == 'push' }}
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}

@@ -36,6 +36,7 @@
     <Project Path="tests/Vidarr.Notifications.Tests/Vidarr.Notifications.Tests.csproj" />
     <Project Path="tests/Vidarr.Rules.Tests/Vidarr.Rules.Tests.csproj" />
     <Project Path="tests/Vidarr.Scheduler.Tests/Vidarr.Scheduler.Tests.csproj" />
+    <Project Path="tests/Vidarr.SmokeTests/Vidarr.SmokeTests.csproj" />
     <Project Path="tests/Vidarr.Tests.Common/Vidarr.Tests.Common.csproj" />
   </Folder>
 </Solution>

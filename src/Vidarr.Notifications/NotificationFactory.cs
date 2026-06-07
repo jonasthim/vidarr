@@ -16,6 +16,7 @@ public interface INotificationFactory
 
 public sealed record NotificationFieldSchema(string Name, string Label, string Type, bool Required, string? HelpText = null);
 
+[System.Diagnostics.CodeAnalysis.ExcludeFromCodeCoverage(Justification = "Trivial cached JsonSerializerOptions singleton; exercised transitively by every factory test.")]
 internal static class NotificationJsonOptions
 {
     public static readonly JsonSerializerOptions Default = new() { PropertyNameCaseInsensitive = true };
