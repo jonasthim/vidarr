@@ -1,5 +1,7 @@
 # syntax=docker/dockerfile:1.7
-FROM mcr.microsoft.com/dotnet/sdk:10.0 AS web-build
+# dotnet/sdk does not ship Node — use the official Node image for the SPA build
+# and copy the dist/ output into the dotnet stage.
+FROM node:20-alpine AS web-build
 WORKDIR /web
 COPY src/Vidarr.Web/package.json src/Vidarr.Web/package-lock.json ./
 RUN npm ci --no-audit --no-fund --silent
