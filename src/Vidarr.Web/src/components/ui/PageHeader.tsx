@@ -1,7 +1,8 @@
 /*
  * Shim: keeps the existing <PageHeader title=… actions=…/> API used across
- * pages but renders in Sonarr's PageToolbar style (slate band, 60px tall, with
- * a left section for the title and a right section for action buttons).
+ * pages but renders Sonarr's PageToolbar band + a PageContentBody-like inner
+ * wrapper. This puts the slate toolbar OUTSIDE the padded body, matching
+ * Sonarr's PageContent > PageToolbar > PageContentBody structure exactly.
  */
 import { ReactNode } from "react";
 import styles from "./PageHeader.module.css";

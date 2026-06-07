@@ -3,7 +3,6 @@ import { Page, PageMain } from "../Components/Page/Page";
 import { PageHeader } from "../Components/Page/Header/PageHeader";
 import { PageSidebar } from "../Components/Page/Sidebar/PageSidebar";
 import { PageContent } from "../Components/Page/PageContent";
-import { PageContentBody } from "../Components/Page/PageContentBody";
 
 export function Layout(): JSX.Element {
   return (
@@ -12,9 +11,7 @@ export function Layout(): JSX.Element {
       <PageMain>
         <PageSidebar />
         <PageContent>
-          <PageContentBody>
-            <Outlet />
-          </PageContentBody>
+          <Outlet />
         </PageContent>
       </PageMain>
     </Page>

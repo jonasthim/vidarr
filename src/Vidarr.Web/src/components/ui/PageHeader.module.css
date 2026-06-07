@@ -3,6 +3,7 @@
   align-items: center;
   justify-content: space-between;
   gap: 20px;
+  /* Bleed to edges past PageContent's 20px padding */
   margin: -20px -20px 20px;
   padding: 0 20px;
   height: var(--toolbarHeight);
@@ -14,26 +15,27 @@
   display: flex;
   align-items: baseline;
   gap: 12px;
+  min-width: 0;
+  overflow: hidden;
 }
 
 .title {
   font-size: 18px;
   font-weight: 500;
   color: var(--white);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .subtitle {
   font-size: var(--smallFontSize);
   color: var(--helpTextColor);
+  white-space: nowrap;
 }
 
 .right {
   display: flex;
   align-items: center;
   gap: 8px;
-}
-
-.right :global(button),
-.right :global(a.btn) {
-  height: 36px;
 }

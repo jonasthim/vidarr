@@ -5,5 +5,13 @@
   flex-direction: column;
   flex-grow: 1;
   overflow-x: hidden;
+  overflow-y: auto;
   width: 100%;
+  padding: var(--pageContentBodyPadding);
+}
+
+@media only screen and (max-width: 768px) {
+  .content {
+    padding: var(--pageContentBodyPaddingSmallScreen);
+  }
 }
