@@ -35,12 +35,24 @@ builder.Host.UseSerilog((ctx, lc) => lc
 var config = builder.Configuration;
 var apiKey = Environment.GetEnvironmentVariable("VIDARR_API_KEY") ?? config["Vidarr:ApiKey"] ?? Guid.NewGuid().ToString("N");
 var sqlitePath = Environment.GetEnvironmentVariable("VIDARR_SQLITE_PATH") ?? config["Vidarr:Sqlite:Path"] ?? "data/vidarr.db";
+var backupFolder = Environment.GetEnvironmentVariable("VIDARR_BACKUP_FOLDER") ?? config["Vidarr:Backup:Folder"] ?? "data/backups";
+var backupRetention = int.TryParse(config["Vidarr:Backup:Retention"], out var r) ? r : 10;
+var appsettingsPath = Path.Combine(builder.Environment.ContentRootPath, "appsettings.json");
 var sqliteConn = $"Data Source={sqlitePath}";
 var imvdbKey = Environment.GetEnvironmentVariable("VIDARR_IMVDB_KEY") ?? config["Vidarr:Imvdb:ApiKey"];
 var incompleteFolder = Environment.GetEnvironmentVariable("VIDARR_INCOMPLETE") ?? config["Vidarr:IncompleteFolder"] ?? "data/incomplete";
 
 Directory.CreateDirectory(Path.GetDirectoryName(Path.GetFullPath(sqlitePath))!);
 Directory.CreateDirectory(Path.GetFullPath(incompleteFolder));
+Directory.CreateDirectory(Path.GetFullPath(backupFolder));
+
+// Apply any staged restore before EF Core opens the SQLite file.
+if (Vidarr.Backup.RestoreBootstrap.ApplyPendingRestore(
+        Path.GetFullPath(sqlitePath),
+        File.Exists(appsettingsPath) ? appsettingsPath : null))
+{
+    Log.Information("Applied staged backup restore on startup");
+}
 
 builder.Services.AddSingleton(new ApiKeyOptions(apiKey));
 builder.Services.AddSingleton<IPasswordHasher, Pbkdf2PasswordHasher>();
@@ -147,6 +159,15 @@ builder.Services.AddSingleton<IRecurringJob, Vidarr.Host.Jobs.WantedVideoSearchJ
 builder.Services.AddSingleton<IRecurringJob, Vidarr.Host.Jobs.RuleSetEvaluationJob>();
 builder.Services.AddSingleton<IRecurringJob, Vidarr.Host.Jobs.BackupJob>();
 
+// Phase 13 — Backup pipeline.
+builder.Services.AddSingleton(new Vidarr.Backup.BackupOptions(
+    BackupFolder: Path.GetFullPath(backupFolder),
+    SqliteSourcePath: Path.GetFullPath(sqlitePath),
+    ConfigSourcePath: File.Exists(appsettingsPath) ? appsettingsPath : null,
+    RetentionCount: backupRetention));
+builder.Services.AddScoped<Vidarr.Backup.IDbCheckpointer, Vidarr.Backup.SqliteWalCheckpointer>();
+builder.Services.AddScoped<Vidarr.Backup.IBackupService, Vidarr.Backup.BackupService>();
+
 // Phase 12 — Health monitor + checks.
 builder.Services.AddScoped<Vidarr.Health.IHealthCheck, Vidarr.Health.DiskSpaceCheck>();
 builder.Services.AddScoped<Vidarr.Health.IHealthCheck, Vidarr.Health.RootFolderAccessibleCheck>();
@@ -180,6 +201,7 @@ app.MapVidarrDiscoveryRuleApi();
 app.MapVidarrNotificationApi();
 app.MapVidarrHealthApi();
 app.MapVidarrAuthApi();
+app.MapVidarrBackupApi();
 
 var wwwroot = Path.Combine(builder.Environment.ContentRootPath, "wwwroot");
 if (Directory.Exists(wwwroot))

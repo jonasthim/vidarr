@@ -1,6 +1,7 @@
 <Solution>
   <Folder Name="/src/">
     <Project Path="src/Vidarr.Api/Vidarr.Api.csproj" />
+    <Project Path="src/Vidarr.Backup/Vidarr.Backup.csproj" />
     <Project Path="src/Vidarr.Catalog/Vidarr.Catalog.csproj" />
     <Project Path="src/Vidarr.ChapterSplit/Vidarr.ChapterSplit.csproj" />
     <Project Path="src/Vidarr.Contracts/Vidarr.Contracts.csproj" />
@@ -20,6 +21,7 @@
   </Folder>
   <Folder Name="/tests/">
     <Project Path="tests/Vidarr.Api.Tests/Vidarr.Api.Tests.csproj" />
+    <Project Path="tests/Vidarr.Backup.Tests/Vidarr.Backup.Tests.csproj" />
     <Project Path="tests/Vidarr.Catalog.Tests/Vidarr.Catalog.Tests.csproj" />
     <Project Path="tests/Vidarr.ChapterSplit.Tests/Vidarr.ChapterSplit.Tests.csproj" />
     <Project Path="tests/Vidarr.Decision.Tests/Vidarr.Decision.Tests.csproj" />

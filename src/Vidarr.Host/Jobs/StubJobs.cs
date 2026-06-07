@@ -46,18 +46,21 @@ public sealed class RuleSetEvaluationJob : IRecurringJob
     }
 }
 
-/// <summary>Stubbed in P7; the backup pipeline lands in Phase 13.</summary>
-[ExcludeFromCodeCoverage(Justification = "Stub job — engine in Phase 13.")]
 public sealed class BackupJob : IRecurringJob
 {
+    private readonly Vidarr.Backup.IBackupService _backups;
     private readonly ILogger<BackupJob> _logger;
-    public BackupJob(ILogger<BackupJob> logger) { _logger = logger; }
+    public BackupJob(Vidarr.Backup.IBackupService backups, ILogger<BackupJob> logger)
+    {
+        _backups = backups;
+        _logger = logger;
+    }
     public string Name => "Backup";
     public TimeSpan Interval => TimeSpan.FromDays(7);
-    public Task RunAsync(CancellationToken ct)
+    public async Task RunAsync(CancellationToken ct)
     {
-        _logger.LogInformation("Backup: deferred to Phase 13 (engine not yet wired)");
-        return Task.CompletedTask;
+        var artifact = await _backups.CreateAsync(ct);
+        _logger.LogInformation("Scheduled backup written: {Path} ({Size} bytes)", artifact.Path, artifact.SizeBytes);
     }
 }
 
