@@ -254,3 +254,167 @@ kbd {
   border-left: 3px solid var(--themeAlternateBlue);
   padding-left: 13px;
 }
+
+/* Library list / view chrome overrides — keep the layout, swap colors. */
+.library-toolbar {
+  background-color: var(--themeDarkColor) !important;
+  border: 1px solid var(--defaultBorderColor) !important;
+  color: var(--textColor);
+}
+
+.poster-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+  gap: 16px;
+}
+
+.artist-card {
+  background-color: var(--cardCenterBackgroundColor) !important;
+  border: 1px solid var(--defaultBorderColor) !important;
+  border-radius: 4px !important;
+  color: var(--textColor) !important;
+  text-decoration: none !important;
+}
+.artist-card:hover {
+  border-color: var(--sonarrBlue) !important;
+}
+.artist-card-poster {
+  background-color: var(--themeDarkColor) !important;
+}
+.artist-card-poster-fallback {
+  color: var(--helpTextColor) !important;
+}
+.artist-card-poster-fallback svg {
+  width: 48px;
+  height: 48px;
+}
+.artist-card-body {
+  padding: 12px !important;
+}
+.artist-card-name {
+  font-weight: 500 !important;
+  color: var(--white) !important;
+}
+
+.banner-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(380px, 1fr));
+  gap: 16px;
+}
+.artist-banner {
+  background-color: var(--cardCenterBackgroundColor) !important;
+  border: 1px solid var(--defaultBorderColor) !important;
+  border-radius: 4px !important;
+  color: var(--textColor) !important;
+  text-decoration: none !important;
+}
+.artist-banner:hover { border-color: var(--sonarrBlue) !important; }
+.artist-banner-image { background-color: var(--themeDarkColor) !important; }
+.artist-banner-name { color: var(--white) !important; font-weight: 500 !important; }
+.artist-banner-meta { color: var(--helpTextColor) !important; }
+
+/* Artist hero (detail page) */
+.artist-hero {
+  background-color: var(--cardCenterBackgroundColor) !important;
+  border: 1px solid var(--defaultBorderColor) !important;
+  border-radius: 4px !important;
+}
+.artist-hero-poster {
+  background-color: var(--themeDarkColor) !important;
+}
+.artist-hero-banner {
+  background-color: var(--themeDarkColor);
+}
+
+/* Library two-pane layout (old; some pages may still use it) */
+.library-list {
+  background-color: var(--cardCenterBackgroundColor) !important;
+  border: 1px solid var(--defaultBorderColor) !important;
+}
+.library-list li.selected {
+  background-color: var(--sidebarActiveBackgroundColor) !important;
+  border-left-color: var(--themeAlternateBlue) !important;
+}
+
+/* AddArtist lookup results */
+.lookup-results li {
+  background-color: var(--cardCenterBackgroundColor) !important;
+  border: 1px solid var(--defaultBorderColor) !important;
+  border-radius: 4px !important;
+}
+
+/* Calendar */
+.calendar {
+  background-color: var(--calendarBorderColor) !important;
+  border: 1px solid var(--calendarBorderColor) !important;
+}
+.calendar-head {
+  background-color: var(--themeDarkColor) !important;
+  color: var(--helpTextColor) !important;
+}
+.calendar-cell {
+  background-color: var(--calendarBackgroundColor) !important;
+}
+.calendar-cell-empty {
+  background-color: var(--pageBackground) !important;
+}
+.calendar-cell.today {
+  background-color: var(--calendarTodayBackgroundColor) !important;
+  border-top: 2px solid var(--sonarrBlue) !important;
+}
+.calendar-day {
+  color: var(--white) !important;
+}
+.calendar-event {
+  background-color: var(--themeDarkColor) !important;
+  color: var(--textColor) !important;
+  border-left-color: var(--helpTextColor) !important;
+}
+.calendar-event:hover {
+  background-color: var(--themeLightColor) !important;
+}
+.calendar-event.downloaded { border-left-color: var(--successColor) !important; }
+.calendar-event.wanted { border-left-color: var(--warningColor) !important; }
+.calendar-event-artist { color: var(--white) !important; }
+.calendar-event-title { color: var(--helpTextColor) !important; }
+
+/* View toggle (Library page) */
+.view-toggle {
+  background-color: var(--themeDarkColor) !important;
+  border: 1px solid var(--defaultBorderColor) !important;
+}
+.view-toggle button {
+  background: transparent !important;
+  border: 0 !important;
+  border-radius: 0 !important;
+  color: var(--textColor) !important;
+}
+.view-toggle button:hover {
+  color: var(--sonarrBlue) !important;
+}
+.view-toggle button.primary {
+  background-color: var(--sidebarActiveBackgroundColor) !important;
+  color: var(--white) !important;
+}
+
+/* Security panel inputs */
+.security-row input {
+  font-family: var(--monoSpaceFontFamily);
+}
+
+/* Login screen */
+.login-shell {
+  background-color: var(--pageBackground) !important;
+}
+.login-card {
+  background-color: var(--cardCenterBackgroundColor) !important;
+  border: 1px solid var(--defaultBorderColor) !important;
+  border-radius: 4px !important;
+}
+
+/* Loading state */
+.loading-state {
+  padding: 60px 30px;
+  text-align: center;
+  color: var(--helpTextColor);
+}
