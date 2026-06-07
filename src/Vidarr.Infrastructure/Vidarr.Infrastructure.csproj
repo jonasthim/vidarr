@@ -2,6 +2,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\Vidarr.Contracts\Vidarr.Contracts.csproj" />
+    <ProjectReference Include="..\Vidarr.Health\Vidarr.Health.csproj" />
   </ItemGroup>
 
   <ItemGroup>

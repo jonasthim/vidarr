@@ -64,6 +64,42 @@ public sealed class BackupJob : IRecurringJob
     }
 }
 
+public sealed class YtDlpUpdaterJob : IRecurringJob
+{
+    private readonly Vidarr.Health.IYtDlpUpdater _updater;
+    private readonly Vidarr.Catalog.Repositories.IApplicationConfigRepository _config;
+    private readonly ILogger<YtDlpUpdaterJob> _logger;
+    public YtDlpUpdaterJob(
+        Vidarr.Health.IYtDlpUpdater updater,
+        Vidarr.Catalog.Repositories.IApplicationConfigRepository config,
+        ILogger<YtDlpUpdaterJob> logger)
+    {
+        _updater = updater;
+        _config = config;
+        _logger = logger;
+    }
+    public string Name => "YtDlpUpdate";
+    public TimeSpan Interval => TimeSpan.FromDays(1);
+    public async Task RunAsync(CancellationToken ct)
+    {
+        var cfg = await _config.GetAsync(ct);
+        if (!cfg.YtDlpAutoUpdate)
+        {
+            _logger.LogDebug("yt-dlp auto-update disabled");
+            return;
+        }
+        var result = await _updater.CheckAndUpdateAsync(ct);
+        if (result.Updated)
+        {
+            _logger.LogInformation("yt-dlp updated to {Version}", result.LatestVersion);
+        }
+        else
+        {
+            _logger.LogInformation("yt-dlp not updated: {Reason}", result.Reason ?? "(no reason)");
+        }
+    }
+}
+
 public sealed class HealthCheckJob : IRecurringJob
 {
     private readonly Vidarr.Health.IHealthMonitor _monitor;

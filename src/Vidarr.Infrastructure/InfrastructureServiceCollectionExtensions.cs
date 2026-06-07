@@ -9,6 +9,7 @@ public static class InfrastructureServiceCollectionExtensions
     {
         services.AddHttpClient("vidarr");
         services.AddSingleton<IHttpClient, HttpClientAdapter>();
+        services.AddSingleton<Vidarr.Health.IBinaryDownloader, BinaryDownloaderAdapter>();
         services.AddSingleton<IFileSystem, FileSystemAdapter>();
         services.AddSingleton<IProcessRunner, ProcessRunnerAdapter>();
         services.AddSingleton<ISystemClock, SystemClock>();

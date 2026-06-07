@@ -83,6 +83,10 @@ public sealed class ApplicationConfig
     public string ArtistFolderTemplate { get; set; } = "{Artist Name}";
     public string FileTemplate { get; set; } = "{Artist Name} - {Title} ({Year}) [{Quality Full}]";
 
+    // yt-dlp updater (Phase 13). Opt-in.
+    public bool YtDlpAutoUpdate { get; set; }
+    public string YtDlpBinaryPath { get; set; } = "yt-dlp";
+
     // Auth (Phase 12). Method is "None" (default) or "Forms".
     public string AuthMethod { get; set; } = "None";
     public string? AuthUsername { get; set; }

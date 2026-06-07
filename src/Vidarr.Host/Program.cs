@@ -174,6 +174,16 @@ builder.Services.AddScoped<Vidarr.Health.IHealthCheck, Vidarr.Health.RootFolderA
 builder.Services.AddScoped<Vidarr.Health.IHealthCheck, Vidarr.Health.IndexerReachableCheck>();
 builder.Services.AddScoped<Vidarr.Health.IHealthCheck, Vidarr.Health.DownloadClientReachableCheck>();
 builder.Services.AddScoped<Vidarr.Health.IHealthCheck, Vidarr.Health.YtDlpVersionCheck>();
+builder.Services.AddSingleton(sp =>
+{
+    var cfg = sp.GetServices<Vidarr.Catalog.Repositories.IApplicationConfigRepository>().FirstOrDefault();
+    // Configuration drives the actual binary path; the updater itself only reads at runtime.
+    return new Vidarr.Health.YtDlpUpdaterOptions(
+        BinaryPath: Environment.GetEnvironmentVariable("VIDARR_YTDLP_PATH") ?? config["Vidarr:YtDlp:Path"] ?? "yt-dlp");
+});
+builder.Services.AddSingleton<Vidarr.Health.IYtDlpUpdater, Vidarr.Health.YtDlpUpdater>();
+builder.Services.AddScoped<IRecurringJob, Vidarr.Host.Jobs.YtDlpUpdaterJob>();
+
 builder.Services.AddSingleton<Vidarr.Health.IHealthMonitor>(sp => new Vidarr.Health.HealthMonitor(
     new HealthCheckResolver(sp),
     sp.GetRequiredService<IEventBus>(),
