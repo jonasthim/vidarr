@@ -1,6 +1,12 @@
 import { Navigate, useParams } from "react-router-dom";
-import { useQuery } from "@tanstack/react-query";
-import { PageHeader, Card, StatusPill } from "../components/ui";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
+import { icons } from "../Components/Icon/Icon";
+import { PageContent } from "../Components/Page/PageContent";
+import { PageContentBody } from "../Components/Page/PageContentBody";
+import { PageToolbar } from "../Components/Page/Toolbar/PageToolbar";
+import { PageToolbarSection } from "../Components/Page/Toolbar/PageToolbarSection";
+import { PageToolbarButton } from "../Components/Page/Toolbar/PageToolbarButton";
+import { Card, StatusPill } from "../components/ui";
 import { ComingSoonPanel } from "../components/ComingSoonPanel";
 import { CommandsPage } from "./Commands";
 import { HealthPage } from "./Health";
@@ -11,38 +17,21 @@ const UpdatesStub = () => (
   <ComingSoonPanel
     title="Updates"
     description="Installed Vidarr version + a list of available release notes pulled from GitHub. Sonarr lets you trigger an in-place upgrade from this page."
-    needs={
-      <span>
-        a release-feed endpoint (<code>/api/v1/update</code>) + the auto-update
-        flag on <code>ApplicationConfig</code> + a small UI.
-      </span>
-    }
+    needs={<span>a release-feed endpoint (<code>/api/v1/update</code>) + the auto-update flag on <code>ApplicationConfig</code> + a small UI.</span>}
   />
 );
-
 const EventsStub = () => (
   <ComingSoonPanel
     title="Events"
     description="A pageable view of recent in-process EventBus traffic — artist refreshes, RSS syncs, decision rejections, etc."
-    needs={
-      <span>
-        a ring-buffer subscription on top of <code>IEventBus</code> + a new
-        <code> /api/v1/system/events</code> stream endpoint.
-      </span>
-    }
+    needs={<span>a ring-buffer subscription on top of <code>IEventBus</code> + a new<code> /api/v1/system/events</code> stream endpoint.</span>}
   />
 );
-
 const LogsStub = () => (
   <ComingSoonPanel
     title="Log Files"
     description="Browse + download the Serilog rolling files written under data/logs."
-    needs={
-      <span>
-        a <code>/api/v1/system/log</code> endpoint that lists / serves files
-        from the log directory.
-      </span>
-    }
+    needs={<span>a <code>/api/v1/system/log</code> endpoint that lists / serves files from the log directory.</span>}
   />
 );
 
@@ -58,13 +47,22 @@ const TABS: Record<string, { label: string; render: () => JSX.Element }> = {
 
 export function SystemPage(): JSX.Element {
   const { tab } = useParams<{ tab: string }>();
+  const queryClient = useQueryClient();
   if (!tab || !TABS[tab]) return <Navigate to="/system/status" replace />;
   const active = TABS[tab];
   return (
-    <>
-      <PageHeader title={active.label} subtitle="System" />
-      {active.render()}
-    </>
+    <PageContent title={active.label}>
+      <PageToolbar>
+        <PageToolbarSection>
+          <PageToolbarButton
+            label="Refresh"
+            iconName={icons.REFRESH}
+            onPress={() => queryClient.invalidateQueries()}
+          />
+        </PageToolbarSection>
+      </PageToolbar>
+      <PageContentBody>{active.render()}</PageContentBody>
+    </PageContent>
   );
 }
 

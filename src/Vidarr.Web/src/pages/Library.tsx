@@ -4,7 +4,13 @@ import { Link } from "react-router-dom";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { icons } from "../Components/Icon/Icon";
 import { api, type ArtistDto } from "../api";
-import { PageHeader, EmptyState, StatusPill } from "../components/ui";
+import { PageContent } from "../Components/Page/PageContent";
+import { PageContentBody } from "../Components/Page/PageContentBody";
+import { PageToolbar } from "../Components/Page/Toolbar/PageToolbar";
+import { PageToolbarSection } from "../Components/Page/Toolbar/PageToolbarSection";
+import { PageToolbarButton } from "../Components/Page/Toolbar/PageToolbarButton";
+import { PageToolbarSeparator } from "../Components/Page/Toolbar/PageToolbarSeparator";
+import { EmptyState, StatusPill } from "../components/ui";
 import { ArtistCard } from "../components/ArtistCard";
 import { ArtistBanner } from "../components/ArtistBanner";
 
@@ -47,129 +53,120 @@ export function LibraryPage(): JSX.Element {
   }, [artists.data, filter]);
 
   return (
-    <>
-      <PageHeader
-        title="Library"
-        subtitle={`${artists.data?.length ?? 0} artist${artists.data?.length === 1 ? "" : "s"} monitored`}
-        actions={
-          <>
-            <ViewToggle view={view} onChange={setView} />
-            <button
-              type="button"
-              onClick={() => refresh.mutate()}
-              disabled={refresh.isPending}
-            >
-              <FontAwesomeIcon icon={icons.SEARCH} />
-              Refresh
-            </button>
-          </>
-        }
-      />
-
-      <div className="library-toolbar">
-        <FontAwesomeIcon icon={icons.SEARCH} className="muted" />
-        <input
-          type="search"
-          placeholder="Filter library…"
-          value={filter}
-          onChange={(e) => setFilter(e.target.value)}
-        />
-      </div>
-
-      {artists.isLoading && <div className="loading-state">Loading…</div>}
-      {artists.data && artists.data.length === 0 && (
-        <EmptyState
-          icon={<FontAwesomeIcon icon={icons.MUSIC} />}
-          title="No artists yet"
-          description="Use Add Artist to start your library."
-        />
-      )}
-      {artists.data && artists.data.length > 0 && filtered.length === 0 && (
-        <EmptyState
-          icon={<FontAwesomeIcon icon={icons.MUSIC} />}
-          title="No matches"
-          description={`Nothing matches "${filter}".`}
-        />
-      )}
-
-      {view === "poster" && filtered.length > 0 && (
-        <div className="poster-grid">
-          {filtered.map((a) => (
-            <ArtistCard key={a.id} artist={a} />
-          ))}
+    <PageContent title="Library">
+      <PageToolbar>
+        <PageToolbarSection>
+          <PageToolbarButton
+            label="Posters"
+            iconName={icons.POSTERS}
+            isActive={view === "poster"}
+            onPress={() => setView("poster")}
+          />
+          <PageToolbarButton
+            label="Banners"
+            iconName={icons.TABLE}
+            isActive={view === "banner"}
+            onPress={() => setView("banner")}
+          />
+          <PageToolbarButton
+            label="Table"
+            iconName={icons.LIST}
+            isActive={view === "table"}
+            onPress={() => setView("table")}
+          />
+          <PageToolbarSeparator />
+          <PageToolbarButton
+            label="Refresh"
+            iconName={icons.REFRESH}
+            isSpinning={refresh.isPending}
+            onPress={() => refresh.mutate()}
+          />
+        </PageToolbarSection>
+        <PageToolbarSection alignContent="right">
+          <PageToolbarButton
+            label="Add Artist"
+            iconName={icons.ADD}
+            to="/add"
+          />
+        </PageToolbarSection>
+      </PageToolbar>
+      <PageContentBody>
+        <div className="library-toolbar">
+          <FontAwesomeIcon icon={icons.SEARCH} className="muted" />
+          <input
+            type="search"
+            placeholder="Filter library…"
+            value={filter}
+            onChange={(e) => setFilter(e.target.value)}
+          />
         </div>
-      )}
-      {view === "banner" && filtered.length > 0 && (
-        <div className="banner-grid">
-          {filtered.map((a) => (
-            <ArtistBanner key={a.id} artist={a} />
-          ))}
-        </div>
-      )}
-      {view === "table" && filtered.length > 0 && (
-        <table className="grid">
-          <thead>
-            <tr>
-              <th>Name</th>
-              <th>Country</th>
-              <th>Genres</th>
-              <th>Monitored</th>
-              <th>Added</th>
-            </tr>
-          </thead>
-          <tbody>
+
+        {artists.isLoading && <div className="loading-state">Loading…</div>}
+        {artists.data && artists.data.length === 0 && (
+          <EmptyState
+            icon={<FontAwesomeIcon icon={icons.MUSIC} />}
+            title="No artists yet"
+            description="Use Add Artist to start your library."
+          />
+        )}
+        {artists.data && artists.data.length > 0 && filtered.length === 0 && (
+          <EmptyState
+            icon={<FontAwesomeIcon icon={icons.MUSIC} />}
+            title="No matches"
+            description={`Nothing matches "${filter}".`}
+          />
+        )}
+
+        {view === "poster" && filtered.length > 0 && (
+          <div className="poster-grid">
             {filtered.map((a) => (
-              <tr key={a.id}>
-                <td>
-                  <Link to={`/library/${a.id}`}>{a.name}</Link>
-                  {a.disambiguation && (
-                    <div className="muted" style={{ fontSize: "var(--fs-sm)" }}>
-                      {a.disambiguation}
-                    </div>
-                  )}
-                </td>
-                <td>{a.country ?? "—"}</td>
-                <td>{a.genres.length > 0 ? a.genres.slice(0, 3).join(", ") : "—"}</td>
-                <td>
-                  <StatusPill variant={a.monitored ? "monitored" : "unmonitored"}>
-                    {a.monitored ? "Yes" : "No"}
-                  </StatusPill>
-                </td>
-                <td>{new Date(a.added).toLocaleDateString()}</td>
-              </tr>
+              <ArtistCard key={a.id} artist={a} />
             ))}
-          </tbody>
-        </table>
-      )}
-    </>
-  );
-}
-
-function ViewToggle({
-  view,
-  onChange,
-}: {
-  view: LibraryView;
-  onChange: (v: LibraryView) => void;
-}): JSX.Element {
-  const options: { v: LibraryView; icon: JSX.Element; label: string }[] = [
-    { v: "poster", icon: <FontAwesomeIcon icon={icons.POSTERS} />, label: "Posters" },
-    { v: "banner", icon: <FontAwesomeIcon icon={icons.TABLE} />, label: "Banners" },
-    { v: "table",  icon: <FontAwesomeIcon icon={icons.LIST} />, label: "Table" },
-  ];
-  return (
-    <div className="view-toggle">
-      {options.map((o) => (
-        <button
-          key={o.v}
-          type="button"
-          className={view === o.v ? "primary" : ""}
-          title={o.label}
-          onClick={() => onChange(o.v)}
-        >
-          {o.icon}
-        </button>
-      ))}
-    </div>
+          </div>
+        )}
+        {view === "banner" && filtered.length > 0 && (
+          <div className="banner-grid">
+            {filtered.map((a) => (
+              <ArtistBanner key={a.id} artist={a} />
+            ))}
+          </div>
+        )}
+        {view === "table" && filtered.length > 0 && (
+          <table className="grid">
+            <thead>
+              <tr>
+                <th>Name</th>
+                <th>Country</th>
+                <th>Genres</th>
+                <th>Monitored</th>
+                <th>Added</th>
+              </tr>
+            </thead>
+            <tbody>
+              {filtered.map((a) => (
+                <tr key={a.id}>
+                  <td>
+                    <Link to={`/library/${a.id}`}>{a.name}</Link>
+                    {a.disambiguation && (
+                      <div className="muted" style={{ fontSize: "var(--smallFontSize)" }}>
+                        {a.disambiguation}
+                      </div>
+                    )}
+                  </td>
+                  <td>{a.country ?? "—"}</td>
+                  <td>{a.genres.length > 0 ? a.genres.slice(0, 3).join(", ") : "—"}</td>
+                  <td>
+                    <StatusPill variant={a.monitored ? "monitored" : "unmonitored"}>
+                      {a.monitored ? "Yes" : "No"}
+                    </StatusPill>
+                  </td>
+                  <td>{new Date(a.added).toLocaleDateString()}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        )}
+      </PageContentBody>
+    </PageContent>
   );
 }

@@ -2,7 +2,7 @@ import { useQuery } from "@tanstack/react-query";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { icons } from "../Components/Icon/Icon";
 import { api } from "../api";
-import { Card, EmptyState, StatusPill } from "../components/ui";
+import { EmptyState, StatusPill } from "../components/ui";
 
 function formatBytes(n: number | undefined | null): string {
   if (n === undefined || n === null) return "—";
@@ -33,44 +33,38 @@ export function QueuePage(): JSX.Element {
     refetchInterval: 2000,
   });
 
+  if (queue.isLoading) return <div className="loading-state">Loading…</div>;
+  if (queue.data && queue.data.length === 0) {
+    return (
+      <EmptyState
+        icon={<FontAwesomeIcon icon={icons.DOWNLOADING} />}
+        title="Nothing in flight"
+        description="Grabbed releases show up here while downloading."
+      />
+    );
+  }
   return (
-    <Card title="Active downloads">
-      {queue.isLoading && <div className="loading-state">Loading…</div>}
-      {queue.data && queue.data.length === 0 && (
-        <EmptyState
-          icon={<FontAwesomeIcon icon={icons.DOWNLOADING} />}
-          title="Nothing in flight"
-          description="Grabbed releases show up here while downloading."
-        />
-      )}
-      {queue.data && queue.data.length > 0 && (
-        <table className="grid">
-          <thead>
-            <tr>
-              <th>Title</th>
-              <th>Status</th>
-              <th>Progress</th>
-              <th>Size</th>
-              <th>ETA</th>
-            </tr>
-          </thead>
-          <tbody>
-            {queue.data.map((q) => (
-              <tr key={q.id}>
-                <td>{q.title}</td>
-                <td><StatusPill variant={statusVariant(q.status)}>{q.status}</StatusPill></td>
-                <td>{percent(q.totalBytes, q.remainingBytes)}</td>
-                <td>{formatBytes(q.totalBytes)}</td>
-                <td>
-                  {q.etaSeconds !== undefined && q.etaSeconds !== null
-                    ? `${Math.round(q.etaSeconds)}s`
-                    : "—"}
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-      )}
-    </Card>
+    <table className="grid">
+      <thead>
+        <tr>
+          <th>Title</th>
+          <th>Status</th>
+          <th>Progress</th>
+          <th>Size</th>
+          <th>ETA</th>
+        </tr>
+      </thead>
+      <tbody>
+        {queue.data?.map((q) => (
+          <tr key={q.id}>
+            <td>{q.title}</td>
+            <td><StatusPill variant={statusVariant(q.status)}>{q.status}</StatusPill></td>
+            <td>{percent(q.totalBytes, q.remainingBytes)}</td>
+            <td>{formatBytes(q.totalBytes)}</td>
+            <td>{q.etaSeconds !== undefined && q.etaSeconds !== null ? `${Math.round(q.etaSeconds)}s` : "—"}</td>
+          </tr>
+        ))}
+      </tbody>
+    </table>
   );
 }

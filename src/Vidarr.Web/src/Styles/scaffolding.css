@@ -164,25 +164,27 @@ table.grid {
   border-radius: 0;
 }
 
+/* Phase B — Sonarr-faithful tables: no row borders, hover-only highlight. */
 table.grid th,
 table.grid td {
   text-align: left;
-  padding: 10px 12px;
-  border-bottom: 1px solid var(--defaultBorderColor);
+  padding: 8px 10px;
+  border: 0;
   vertical-align: middle;
 }
 
 table.grid th {
-  background-color: var(--themeDarkColor);
+  background-color: transparent;
   font-size: var(--smallFontSize);
   text-transform: uppercase;
   letter-spacing: 0.04em;
   color: var(--white);
   font-weight: 500;
+  border-bottom: 1px solid var(--defaultBorderColor);
 }
 
 table.grid tbody tr {
-  transition: background-color 200ms;
+  transition: background-color 500ms;
 }
 
 table.grid tbody tr:hover {

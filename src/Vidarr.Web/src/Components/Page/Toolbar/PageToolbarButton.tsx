@@ -1,5 +1,4 @@
-/* Adapted from Sonarr (GPL-3.0). */
-import { ReactNode } from "react";
+/* Adapted from Sonarr (GPL-3.0). Vertical icon-stacked toolbar button. */
 import { Link } from "react-router-dom";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import type { IconDefinition } from "@fortawesome/fontawesome-svg-core";
@@ -8,10 +7,10 @@ import styles from "./PageToolbarButton.module.css";
 
 type CommonProps = {
   label: string;
-  iconName?: IconDefinition;
+  iconName: IconDefinition;
   isDisabled?: boolean;
   isActive?: boolean;
-  children?: ReactNode;
+  isSpinning?: boolean;
 };
 
 type Props =
@@ -19,7 +18,7 @@ type Props =
   | (CommonProps & { to: string; onPress?: never });
 
 export function PageToolbarButton(props: Props): JSX.Element {
-  const { label, iconName, isDisabled, isActive } = props;
+  const { label, iconName, isDisabled, isActive, isSpinning } = props;
   const className = classNames(
     styles.toolbarButton,
     isDisabled && styles.isDisabled,
@@ -28,16 +27,26 @@ export function PageToolbarButton(props: Props): JSX.Element {
   const inner = (
     <>
       <span className={styles.iconContainer}>
-        {iconName && <FontAwesomeIcon icon={iconName} />}
+        <FontAwesomeIcon icon={iconName} className={isSpinning ? styles.spinning : undefined} />
       </span>
       <span className={styles.label}>{label}</span>
     </>
   );
   if ("to" in props && props.to) {
-    return <Link to={props.to} className={className}>{inner}</Link>;
+    return (
+      <Link to={props.to} className={className} title={label}>
+        {inner}
+      </Link>
+    );
   }
   return (
-    <button type="button" disabled={isDisabled} onClick={props.onPress} className={className}>
+    <button
+      type="button"
+      disabled={isDisabled}
+      onClick={props.onPress}
+      className={className}
+      title={label}
+    >
       {inner}
     </button>
   );

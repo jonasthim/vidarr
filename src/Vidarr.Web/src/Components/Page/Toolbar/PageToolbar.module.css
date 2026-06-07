@@ -1,4 +1,4 @@
-/* Adapted from Sonarr frontend/src/Components/Page/Toolbar/PageToolbar.css. GPL-3.0. */
+/* Adapted from Sonarr (GPL-3.0). 60px slate toolbar band that bleeds full width. */
 .toolbar {
   display: flex;
   justify-content: space-between;
@@ -7,7 +7,6 @@
   height: var(--toolbarHeight);
   background-color: var(--toolbarBackgroundColor);
   color: var(--toolbarColor);
-  line-height: var(--toolbarHeight);
 }
 
 @media only screen and (max-width: 768px) {

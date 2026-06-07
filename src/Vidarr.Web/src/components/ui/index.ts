@@ -1,4 +1,3 @@
-export { PageHeader } from "./PageHeader";
 export { Card } from "./Card";
 export { StatusPill } from "./StatusPill";
 export { Tabs } from "./Tabs";
