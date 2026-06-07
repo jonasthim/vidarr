@@ -1,0 +1,15 @@
+**/bin/
+**/obj/
+**/node_modules/
+**/dist/
+**/.vs/
+**/.vscode/
+**/.idea/
+**/TestResults/
+**/coverage*.xml
+**/coverage.cobertura.xml
+data/
+docs/
+.git/
+.gitignore
+README.md

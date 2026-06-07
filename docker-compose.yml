@@ -1,0 +1,23 @@
+services:
+  vidarr:
+    image: ghcr.io/vidarr/vidarr:latest
+    container_name: vidarr
+    build:
+      context: .
+      dockerfile: Dockerfile
+    restart: unless-stopped
+    ports:
+      - "8989:8989"
+    environment:
+      - TZ=UTC
+      - VIDARR_API_KEY=${VIDARR_API_KEY:-}
+    volumes:
+      - ./data/config:/config
+      - ./data/downloads:/downloads
+      - ./data/library:/library
+    healthcheck:
+      test: ["CMD", "curl", "-fsS", "http://localhost:8989/api/v1/system/status"]
+      interval: 30s
+      timeout: 5s
+      retries: 5
+      start_period: 30s
