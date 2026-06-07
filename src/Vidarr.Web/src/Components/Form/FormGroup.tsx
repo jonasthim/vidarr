@@ -1,14 +1,10 @@
-/* Adapted from Sonarr (GPL-3.0). */
+/* Adapted from Sonarr Form/FormGroup (GPL-3.0). */
 import { ReactNode } from "react";
 import styles from "./FormGroup.module.css";
 
-type Props = { label: ReactNode; children: ReactNode };
+type Size = "extraSmall" | "small" | "medium" | "large";
+type Props = { size?: Size; children: ReactNode };
 
-export function FormGroup({ label, children }: Props): JSX.Element {
-  return (
-    <div className={styles.group}>
-      <div className={styles.label}>{label}</div>
-      <div className={styles.input}>{children}</div>
-    </div>
-  );
+export function FormGroup({ size = "small", children }: Props): JSX.Element {
+  return <div className={`${styles.group} ${styles[size]}`}>{children}</div>;
 }

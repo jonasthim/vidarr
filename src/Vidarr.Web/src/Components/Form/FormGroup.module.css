@@ -1,38 +1,14 @@
-/* Adapted from Sonarr (GPL-3.0). */
+/* Adapted from Sonarr Form/FormGroup.css. GPL-3.0. */
 .group {
   display: flex;
-  align-items: center;
-  gap: 10px;
-  padding: 8px 0;
-  border-bottom: 1px solid var(--defaultBorderColor);
-}
-.group:last-child { border-bottom: 0; }
-
-.label {
-  flex: 0 0 var(--formLabelSmallWidth);
-  font-weight: 500;
-  color: var(--textColor);
+  margin-bottom: 20px;
 }
 
-.input {
-  flex: 1 1 auto;
-}
+.extraSmall { max-width: var(--formGroupExtraSmallWidth); }
+.small      { max-width: var(--formGroupSmallWidth); }
+.medium     { max-width: var(--formGroupMediumWidth); }
+.large      { max-width: var(--formGroupLargeWidth); }
 
-.input input,
-.input select,
-.input textarea {
-  width: 100%;
-  padding: 6px 10px;
-  background-color: var(--inputBackgroundColor);
-  border: 1px solid var(--defaultBorderColor);
-  border-radius: 4px;
-  color: var(--textColor);
-  font: inherit;
-  outline: 0;
-}
-.input input:focus,
-.input select:focus,
-.input textarea:focus {
-  border-color: var(--inputFocusBorderColor);
-  box-shadow: 0 0 6px var(--inputFocusBoxShadowColor);
+@media only screen and (max-width: 1200px) {
+  .group { display: block; }
 }

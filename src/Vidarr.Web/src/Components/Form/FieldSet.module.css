@@ -1,0 +1,21 @@
+/* Adapted from Sonarr Components/FieldSet.css. GPL-3.0. */
+.fieldSet {
+  margin-bottom: 20px;
+  padding: 0;
+  border: 0;
+}
+
+.legend {
+  padding: 10px 0;
+  width: 100%;
+  border-bottom: 1px solid var(--defaultBorderColor);
+  color: var(--white);
+  font-size: var(--largeFontSize);
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.body {
+  padding: 20px 0;
+}

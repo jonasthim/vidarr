@@ -1,0 +1,24 @@
+/* Adapted from Sonarr Form/FormInputGroup.css. GPL-3.0. */
+.inputGroupContainer {
+  flex: 1 1 auto;
+  min-width: 0;
+}
+
+.inputGroup {
+  display: flex;
+  flex: 1 1 auto;
+  flex-wrap: wrap;
+}
+
+.inputContainer {
+  position: relative;
+  flex: 1 1 auto;
+  min-width: 0;
+}
+
+.helpText {
+  margin-top: 5px;
+  color: var(--helpTextColor);
+  font-size: var(--smallFontSize);
+  line-height: 20px;
+}
