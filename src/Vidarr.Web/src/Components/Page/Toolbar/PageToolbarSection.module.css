@@ -1,0 +1,16 @@
+/* Adapted from Sonarr frontend/src/Components/Page/Toolbar/PageToolbarSection.css. GPL-3.0. */
+.sectionContainer {
+  display: flex;
+  flex: 1 1 auto;
+  overflow: hidden;
+}
+
+.section {
+  display: flex;
+  align-items: stretch;
+  flex-grow: 1;
+}
+
+.left   { justify-content: flex-start; }
+.center { justify-content: center; }
+.right  { justify-content: flex-end; }

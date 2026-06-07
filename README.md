@@ -3,7 +3,7 @@
 A self-hosted, *arr-style application that maintains a library of music videos.
 
 [![CI](https://github.com/jonasthim/vidarr/actions/workflows/ci.yml/badge.svg)](https://github.com/jonasthim/vidarr/actions/workflows/ci.yml)
-[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
+[![License: GPL v3](https://img.shields.io/badge/License-GPL%20v3-blue.svg)](LICENSE)
 
 > **Status: v0.1 — initial release.** All 14 implementation phases shipped (~683 tests, 96.9% line coverage), but the app has not yet been baked in a real-world deployment. Expect rough edges.
 
@@ -118,4 +118,6 @@ Shipped vs. deferred is tracked phase-by-phase in [`docs/superpowers/plans/2026-
 
 ## License
 
-MIT. See [LICENSE](LICENSE).
+GNU General Public License, Version 3. See [LICENSE](LICENSE).
+
+The frontend is adapted from [Sonarr](https://github.com/Sonarr/Sonarr) (also GPL-3.0). Per-file attribution and a list of upstream commits live in [`NOTICE.md`](NOTICE.md).

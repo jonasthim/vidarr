@@ -1,0 +1,9 @@
+/* Adapted from Sonarr frontend/src/Components/Page/Toolbar/PageToolbarSeparator.css. GPL-3.0. */
+.separator {
+  align-self: center;
+  margin: 0 var(--toolbarSeparatorMargin);
+  width: 1px;
+  height: 50%;
+  background-color: var(--borderColor);
+  opacity: 0.5;
+}

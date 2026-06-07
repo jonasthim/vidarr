@@ -1,0 +1,49 @@
+/* Adapted from Sonarr frontend/src/Components/Page/Header/PageHeader.css. GPL-3.0. */
+.header {
+  display: flex;
+  align-items: center;
+  flex: 0 0 auto;
+  height: var(--headerHeight);
+  background-color: var(--pageHeaderBackgroundColor);
+  color: var(--white);
+}
+
+.logoContainer {
+  display: flex;
+  align-items: center;
+  flex: 0 0 var(--sidebarWidth);
+  padding-left: 20px;
+}
+
+.logo {
+  font-size: 20px;
+  font-weight: 500;
+  color: var(--white);
+}
+
+.logo span {
+  color: var(--sonarrBlue);
+}
+
+.right {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  flex-grow: 1;
+  padding-right: 20px;
+  gap: 16px;
+}
+
+.headerButton {
+  background: transparent;
+  border: 0;
+  color: var(--white);
+  cursor: pointer;
+  font-size: 14px;
+  padding: 6px 10px;
+}
+.headerButton:hover { color: var(--sonarrBlue); }
+
+@media only screen and (max-width: 768px) {
+  .logoContainer { flex: 0 0 60px; }
+}

@@ -1,0 +1,46 @@
+/* Adapted from Sonarr frontend/src/Components/Page/Toolbar/PageToolbarButton.css. GPL-3.0. */
+.toolbarButton {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  padding: 6px 10px;
+  width: var(--toolbarButtonWidth);
+  height: var(--toolbarHeight);
+  text-align: center;
+  background: transparent;
+  border: 0;
+  color: var(--toolbarColor);
+  cursor: pointer;
+  line-height: 1;
+  font-size: var(--defaultFontSize);
+  text-decoration: none;
+}
+
+.toolbarButton:hover:not(.isDisabled),
+.toolbarButton:focus:not(.isDisabled) {
+  color: var(--toobarButtonHoverColor);
+}
+
+.isActive {
+  color: var(--toobarButtonSelectedColor);
+}
+
+.isDisabled {
+  color: var(--disabledColor);
+  cursor: not-allowed;
+}
+
+.label {
+  padding: 0 3px;
+  font-size: var(--extraSmallFontSize);
+  line-height: calc(var(--extraSmallFontSize) + 1px);
+}
+
+.iconContainer {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 24px;
+}

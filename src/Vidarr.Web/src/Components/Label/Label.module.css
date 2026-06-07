@@ -1,0 +1,32 @@
+/* Adapted from Sonarr frontend/src/Components/Label.css. GPL-3.0. */
+.label {
+  display: inline-block;
+  margin: 2px;
+  padding: 2px 8px;
+  border: 1px solid;
+  border-radius: 2px;
+  color: var(--white);
+  text-align: center;
+  white-space: nowrap;
+  line-height: 1.3;
+  font-size: var(--smallFontSize);
+  cursor: default;
+}
+
+.danger    { border-color: var(--dangerColor);   background-color: var(--dangerColor); }
+.default   { border-color: var(--themeLightColor); background-color: var(--themeLightColor); }
+.disabled  { border-color: var(--disabledColor); background-color: var(--disabledColor); }
+.info      { border-color: var(--infoColor);     background-color: var(--infoColor);    color: var(--infoTextColor); }
+.inverse   { border-color: var(--inverseLabelColor); background-color: var(--inverseLabelColor); color: var(--inverseLabelTextColor); }
+.primary   { border-color: var(--primaryColor);  background-color: var(--primaryColor); }
+.success   { border-color: var(--successColor);  background-color: var(--successColor); color: #eee; }
+.warning   { border-color: var(--warningColor);  background-color: var(--warningColor); }
+.purple    { border-color: var(--purple);        background-color: var(--purple); }
+.pink      { border-color: var(--pink);          background-color: var(--pink); }
+
+.outline.danger   { background: transparent; color: var(--dangerColor); }
+.outline.default  { background: transparent; color: var(--themeLightColor); }
+.outline.info     { background: transparent; color: var(--infoColor); }
+.outline.primary  { background: transparent; color: var(--primaryColor); }
+.outline.success  { background: transparent; color: var(--successColor); }
+.outline.warning  { background: transparent; color: var(--warningColor); }

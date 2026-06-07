@@ -1,0 +1,9 @@
+/* Adapted from Sonarr frontend/src/Components/Page/PageContent.css. GPL-3.0. */
+.content {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  flex-grow: 1;
+  overflow-x: hidden;
+  width: 100%;
+}

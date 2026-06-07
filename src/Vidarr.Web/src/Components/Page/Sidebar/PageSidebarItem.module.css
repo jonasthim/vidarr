@@ -1,0 +1,34 @@
+/* Adapted from Sonarr frontend/src/Components/Page/Sidebar/PageSidebarItem.css. GPL-3.0. */
+.item {
+  border-left: 3px solid transparent;
+  color: var(--sidebarColor);
+  transition: border-left 0.3s ease-in-out;
+  list-style: none;
+}
+
+.isActiveItem {
+  border-left: 3px solid var(--themeAlternateBlue);
+  background-color: var(--sidebarActiveBackgroundColor);
+}
+
+.link {
+  display: block;
+  padding: 12px 24px;
+  color: var(--sidebarColor);
+  text-decoration: none;
+}
+.link:hover {
+  color: var(--themeBlue);
+  text-decoration: none;
+}
+
+.isActiveLink {
+  color: var(--themeAlternateBlue);
+}
+
+.iconContainer {
+  display: inline-block;
+  margin-right: 7px;
+  width: 18px;
+  text-align: center;
+}

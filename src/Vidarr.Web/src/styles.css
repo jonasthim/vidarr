@@ -1,3 +1,13 @@
+@import "./Styles/fonts.css";
+@import "./Styles/variables.css";
+@import "./Styles/scaffolding.css";
+
+/*
+ * Legacy CSS from the P1 hand-rolled design system, kept around until every
+ * page in src/pages/ + every panel in src/components/*Panel.tsx is refactored
+ * to the new Sonarr-derived Components/. Drop these imports once the migration
+ * is done.
+ */
 @import "./theme.css";
 @import "./layout.css";
 @import "./components.css";

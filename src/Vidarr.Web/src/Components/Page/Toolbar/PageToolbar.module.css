@@ -1,0 +1,15 @@
+/* Adapted from Sonarr frontend/src/Components/Page/Toolbar/PageToolbar.css. GPL-3.0. */
+.toolbar {
+  display: flex;
+  justify-content: space-between;
+  flex: 0 0 auto;
+  padding: 0 20px;
+  height: var(--toolbarHeight);
+  background-color: var(--toolbarBackgroundColor);
+  color: var(--toolbarColor);
+  line-height: var(--toolbarHeight);
+}
+
+@media only screen and (max-width: 768px) {
+  .toolbar { padding: 0 10px; }
+}

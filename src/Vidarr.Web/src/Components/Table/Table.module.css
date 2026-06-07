@@ -1,0 +1,40 @@
+/* Adapted from Sonarr (GPL-3.0). */
+.tableContainer { overflow-x: auto; }
+
+.table {
+  max-width: 100%;
+  width: 100%;
+  border-collapse: collapse;
+  background: transparent;
+  color: var(--textColor);
+}
+
+.headerCell {
+  padding: 8px;
+  border: none;
+  text-align: left;
+  font-weight: bold;
+  font-size: var(--smallFontSize);
+  color: var(--white);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  white-space: nowrap;
+}
+
+.row {
+  transition: background-color 200ms;
+  border-bottom: 1px solid var(--defaultBorderColor);
+}
+.row:hover {
+  background-color: var(--tableRowHoverBackgroundColor);
+}
+
+.cell {
+  padding: 10px 8px;
+  vertical-align: middle;
+}
+
+.actions {
+  text-align: right;
+  white-space: nowrap;
+}

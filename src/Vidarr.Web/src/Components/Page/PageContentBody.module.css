@@ -1,0 +1,18 @@
+/* Adapted from Sonarr frontend/src/Components/Page/PageContentBody.css. GPL-3.0. */
+.contentBody {
+  flex: 1 0 1px;
+  overflow-y: auto;
+}
+
+.innerContentBody {
+  padding: var(--pageContentBodyPadding);
+}
+
+@media only screen and (max-width: 768px) {
+  .contentBody {
+    flex-basis: auto;
+  }
+  .innerContentBody {
+    padding: var(--pageContentBodyPaddingSmallScreen);
+  }
+}

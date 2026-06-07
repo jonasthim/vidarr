@@ -1,0 +1,19 @@
+/* Adapted from Sonarr frontend/src/Components/Page/Page.css. GPL-3.0. */
+.page {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+
+.main {
+  position: relative;
+  display: flex;
+  flex: 1 1 auto;
+}
+
+@media only screen and (max-width: 768px) {
+  .page {
+    flex-grow: 1;
+    height: initial;
+  }
+}
