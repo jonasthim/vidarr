@@ -1,5 +1,6 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { Heart, RefreshCw } from "lucide-react";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { icons } from "../Components/Icon/Icon";
 import { api, HealthIssue } from "../api";
 import { Card, EmptyState, StatusPill } from "../components/ui";
 
@@ -32,7 +33,7 @@ export function HealthPage(): JSX.Element {
           disabled={runMutation.isPending}
           onClick={() => runMutation.mutate()}
         >
-          <RefreshCw size={14} />
+          <FontAwesomeIcon icon={icons.REFRESH} />
           {runMutation.isPending ? "Running…" : "Run checks now"}
         </button>
       }
@@ -46,7 +47,7 @@ export function HealthPage(): JSX.Element {
           </p>
           {data.issues.length === 0 ? (
             <EmptyState
-              icon={<Heart />}
+              icon={<FontAwesomeIcon icon={icons.HEALTH} />}
               title="All checks passing"
               description="No active issues. Vidarr re-runs health checks every 15 minutes."
             />

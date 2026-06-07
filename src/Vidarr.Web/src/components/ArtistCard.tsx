@@ -1,5 +1,6 @@
 import { Link } from "react-router-dom";
-import { Music } from "lucide-react";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { icons } from "../Components/Icon/Icon";
 import type { ArtistDto } from "../api";
 import { StatusPill } from "./ui";
 import { pickPoster } from "./ArtistImageHelpers";
@@ -15,7 +16,7 @@ export function ArtistCard({ artist }: Props): JSX.Element {
           <img src={poster.url} alt={artist.name} loading="lazy" />
         ) : (
           <div className="artist-card-poster-fallback">
-            <Music />
+            <FontAwesomeIcon icon={icons.MUSIC} />
           </div>
         )}
       </div>

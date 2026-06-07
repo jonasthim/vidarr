@@ -1,7 +1,8 @@
 import { useMemo, useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { Link } from "react-router-dom";
-import { ChevronLeft, ChevronRight } from "lucide-react";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { icons } from "../Components/Icon/Icon";
 import { api, type MusicVideoListItem } from "../api";
 import { PageHeader, Card, StatusPill } from "../components/ui";
 
@@ -85,7 +86,7 @@ export function CalendarPage(): JSX.Element {
         actions={
           <>
             <button type="button" onClick={() => setCursor((c) => addMonths(c, -1))}>
-              <ChevronLeft size={14} />
+              <FontAwesomeIcon icon={icons.CHEVRON_LEFT} />
               Prev
             </button>
             <button type="button" onClick={() => setCursor(startOfMonth(new Date()))}>
@@ -93,7 +94,7 @@ export function CalendarPage(): JSX.Element {
             </button>
             <button type="button" onClick={() => setCursor((c) => addMonths(c, 1))}>
               Next
-              <ChevronRight size={14} />
+              <FontAwesomeIcon icon={icons.CHEVRON_RIGHT} />
             </button>
           </>
         }

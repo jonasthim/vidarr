@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { Plus, Search } from "lucide-react";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { icons } from "../Components/Icon/Icon";
 import { api, type ArtistLookupResult } from "../api";
 import { PageHeader, Card } from "../components/ui";
 
@@ -76,7 +77,7 @@ export function AddArtistPage(): JSX.Element {
             />
           </div>
           <button type="submit" className="primary" disabled={lookupMutation.isPending}>
-            <Search size={14} />
+            <FontAwesomeIcon icon={icons.SEARCH} />
             {lookupMutation.isPending ? "Searching…" : "Search"}
           </button>
         </form>
@@ -105,7 +106,7 @@ export function AddArtistPage(): JSX.Element {
                   disabled={addMutation.isPending}
                   onClick={() => addMutation.mutate(r.providerId)}
                 >
-                  <Plus size={14} />
+                  <FontAwesomeIcon icon={icons.ADD} />
                   Add
                 </button>
               </li>

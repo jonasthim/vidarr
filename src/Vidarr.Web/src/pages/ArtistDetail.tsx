@@ -1,7 +1,8 @@
 import { useEffect, useState } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { Link, useParams } from "react-router-dom";
-import { ArrowLeft, Music, RefreshCw, Search } from "lucide-react";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { icons } from "../Components/Icon/Icon";
 import { api, type ReleaseSearchItem } from "../api";
 import { PageHeader, Card, StatusPill, EmptyState } from "../components/ui";
 import { pickPoster, pickBanner } from "../components/ArtistImageHelpers";
@@ -95,7 +96,7 @@ export function ArtistDetail(): JSX.Element {
         title={
           <span style={{ display: "flex", alignItems: "center", gap: "var(--space-3)" }}>
             <Link to="/library" className="ghost btn" style={{ padding: 4 }}>
-              <ArrowLeft size={16} />
+              <FontAwesomeIcon icon={icons.ARROW_LEFT} />
             </Link>
             {artist.name}
           </span>
@@ -108,7 +109,7 @@ export function ArtistDetail(): JSX.Element {
             disabled={search.isPending}
             onClick={() => search.mutate(id)}
           >
-            <Search size={14} />
+            <FontAwesomeIcon icon={icons.SEARCH} />
             {search.isPending ? "Searching…" : "Search now"}
           </button>
         }
@@ -120,7 +121,7 @@ export function ArtistDetail(): JSX.Element {
             <img src={poster.url} alt={artist.name} />
           ) : (
             <div className="artist-card-poster-fallback">
-              <Music />
+              <FontAwesomeIcon icon={icons.MUSIC} />
             </div>
           )}
         </div>
@@ -193,7 +194,7 @@ export function ArtistDetail(): JSX.Element {
         {videosQuery.isLoading && <div className="loading-state">Loading…</div>}
         {videosQuery.data && videosQuery.data.length === 0 && (
           <EmptyState
-            icon={<Music />}
+            icon={<FontAwesomeIcon icon={icons.MUSIC} />}
             title="No videos yet"
             description="Trigger Search now to pull from configured indexers."
           />
@@ -222,7 +223,9 @@ export function ArtistDetail(): JSX.Element {
                         loading="lazy"
                         style={{ width: 56, height: 32, objectFit: "cover", borderRadius: 2 }}
                       />
-                    ) : null}
+                    ) : (
+                      <FontAwesomeIcon icon={icons.MUSIC} />
+                    )}
                   </td>
                   <td>
                     <strong>{v.title}</strong>
@@ -253,7 +256,7 @@ export function ArtistDetail(): JSX.Element {
                         interactive.mutate({ musicVideoId: v.id });
                       }}
                     >
-                      <Search size={14} />
+                      <FontAwesomeIcon icon={icons.SEARCH} />
                       Search
                     </button>
                   </td>
@@ -283,7 +286,7 @@ export function ArtistDetail(): JSX.Element {
           {interactive.isPending && <div className="loading-state">Searching…</div>}
           {!interactive.isPending && searchResults.length === 0 && (
             <EmptyState
-              icon={<RefreshCw />}
+              icon={<FontAwesomeIcon icon={icons.REFRESH} />}
               title="No releases"
               description="No indexer returned a match."
             />

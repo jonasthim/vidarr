@@ -1,5 +1,6 @@
 import { Link } from "react-router-dom";
-import { Music } from "lucide-react";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { icons } from "../Components/Icon/Icon";
 import type { ArtistDto } from "../api";
 import { StatusPill } from "./ui";
 import { pickBanner } from "./ArtistImageHelpers";
@@ -15,7 +16,7 @@ export function ArtistBanner({ artist }: Props): JSX.Element {
           <img src={banner.url} alt={artist.name} loading="lazy" />
         ) : (
           <div className="artist-banner-fallback">
-            <Music />
+            <FontAwesomeIcon icon={icons.MUSIC} />
           </div>
         )}
       </div>

@@ -1,5 +1,6 @@
 import { ReactNode, useEffect } from "react";
-import { X } from "lucide-react";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { icons } from "../../Components/Icon/Icon";
 
 type Props = {
   open: boolean;
@@ -32,7 +33,7 @@ export function Modal({ open, title, onClose, children, footer }: Props): JSX.El
         <div className="modal-header">
           <h2>{title}</h2>
           <button type="button" className="ghost icon-btn" onClick={onClose} aria-label="Close">
-            <X />
+            <FontAwesomeIcon icon={icons.REMOVE} />
           </button>
         </div>
         <div className="modal-body">{children}</div>

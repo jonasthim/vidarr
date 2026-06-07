@@ -1,5 +1,6 @@
 import { useQuery } from "@tanstack/react-query";
-import { Inbox } from "lucide-react";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { icons } from "../Components/Icon/Icon";
 import { api } from "../api";
 import { Card, EmptyState, StatusPill } from "../components/ui";
 
@@ -37,7 +38,7 @@ export function QueuePage(): JSX.Element {
       {queue.isLoading && <div className="loading-state">Loading…</div>}
       {queue.data && queue.data.length === 0 && (
         <EmptyState
-          icon={<Inbox />}
+          icon={<FontAwesomeIcon icon={icons.DOWNLOADING} />}
           title="Nothing in flight"
           description="Grabbed releases show up here while downloading."
         />

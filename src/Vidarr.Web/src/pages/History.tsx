@@ -1,5 +1,6 @@
 import { useQuery } from "@tanstack/react-query";
-import { History as HistoryIcon } from "lucide-react";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { icons } from "../Components/Icon/Icon";
 import { api } from "../api";
 import { Card, EmptyState, StatusPill } from "../components/ui";
 
@@ -29,7 +30,7 @@ export function HistoryPage(): JSX.Element {
       {history.isLoading && <div className="loading-state">Loading…</div>}
       {history.data && history.data.length === 0 && (
         <EmptyState
-          icon={<HistoryIcon />}
+          icon={<FontAwesomeIcon icon={icons.CLOCK} />}
           title="No history yet"
           description="Grabs, imports, upgrades, and deletes will show up here."
         />

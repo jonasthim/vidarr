@@ -1,5 +1,6 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { Archive, Trash2 } from "lucide-react";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { icons } from "../Components/Icon/Icon";
 import { api } from "../api";
 import { Card, EmptyState, StatusPill } from "./ui";
 
@@ -24,7 +25,7 @@ export function BackupPanel(): JSX.Element {
       title="Backups"
       actions={
         <button type="button" className="primary" onClick={() => create.mutate()} disabled={create.isPending}>
-          <Archive size={14} />
+          <FontAwesomeIcon icon={icons.ARCHIVE} />
           {create.isPending ? "Creating…" : "Backup now"}
         </button>
       }
@@ -35,7 +36,7 @@ export function BackupPanel(): JSX.Element {
       )}
       {backupsQuery.data && backupsQuery.data.length === 0 && (
         <EmptyState
-          icon={<Archive />}
+          icon={<FontAwesomeIcon icon={icons.ARCHIVE} />}
           title="No backups yet"
           description="Click Backup now to create the first one. Vidarr also creates one weekly via the scheduler."
         />
@@ -66,7 +67,7 @@ export function BackupPanel(): JSX.Element {
                     }}
                     disabled={del.isPending}
                   >
-                    <Trash2 size={14} />
+                    <FontAwesomeIcon icon={icons.DELETE} />
                   </button>
                 </td>
               </tr>

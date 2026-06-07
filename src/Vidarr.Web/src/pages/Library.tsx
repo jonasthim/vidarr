@@ -1,13 +1,8 @@
 import { useEffect, useMemo, useState } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { Link } from "react-router-dom";
-import {
-  Grid3x3,
-  Image,
-  LayoutList,
-  Music,
-  Search,
-} from "lucide-react";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { icons } from "../Components/Icon/Icon";
 import { api, type ArtistDto } from "../api";
 import { PageHeader, EmptyState, StatusPill } from "../components/ui";
 import { ArtistCard } from "../components/ArtistCard";
@@ -64,7 +59,7 @@ export function LibraryPage(): JSX.Element {
               onClick={() => refresh.mutate()}
               disabled={refresh.isPending}
             >
-              <Search size={14} />
+              <FontAwesomeIcon icon={icons.SEARCH} />
               Refresh
             </button>
           </>
@@ -72,7 +67,7 @@ export function LibraryPage(): JSX.Element {
       />
 
       <div className="library-toolbar">
-        <Search size={14} className="muted" />
+        <FontAwesomeIcon icon={icons.SEARCH} className="muted" />
         <input
           type="search"
           placeholder="Filter library…"
@@ -84,14 +79,14 @@ export function LibraryPage(): JSX.Element {
       {artists.isLoading && <div className="loading-state">Loading…</div>}
       {artists.data && artists.data.length === 0 && (
         <EmptyState
-          icon={<Music />}
+          icon={<FontAwesomeIcon icon={icons.MUSIC} />}
           title="No artists yet"
           description="Use Add Artist to start your library."
         />
       )}
       {artists.data && artists.data.length > 0 && filtered.length === 0 && (
         <EmptyState
-          icon={<Music />}
+          icon={<FontAwesomeIcon icon={icons.MUSIC} />}
           title="No matches"
           description={`Nothing matches "${filter}".`}
         />
@@ -158,9 +153,9 @@ function ViewToggle({
   onChange: (v: LibraryView) => void;
 }): JSX.Element {
   const options: { v: LibraryView; icon: JSX.Element; label: string }[] = [
-    { v: "poster", icon: <Grid3x3 size={14} />, label: "Posters" },
-    { v: "banner", icon: <Image size={14} />, label: "Banners" },
-    { v: "table",  icon: <LayoutList size={14} />, label: "Table" },
+    { v: "poster", icon: <FontAwesomeIcon icon={icons.POSTERS} />, label: "Posters" },
+    { v: "banner", icon: <FontAwesomeIcon icon={icons.TABLE} />, label: "Banners" },
+    { v: "table",  icon: <FontAwesomeIcon icon={icons.LIST} />, label: "Table" },
   ];
   return (
     <div className="view-toggle">

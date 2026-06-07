@@ -1,5 +1,6 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { Play } from "lucide-react";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { icons } from "../Components/Icon/Icon";
 import { api } from "../api";
 import { Card, StatusPill } from "../components/ui";
 
@@ -68,7 +69,7 @@ export function CommandsPage(): JSX.Element {
                   disabled={run.isPending}
                   onClick={() => run.mutate(c.name)}
                 >
-                  <Play size={14} />
+                  <FontAwesomeIcon icon={icons.PLAY} />
                   Run now
                 </button>
               </td>

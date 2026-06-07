@@ -1,6 +1,7 @@
 import { Navigate, useParams, Link } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
-import { AlertCircle, Music } from "lucide-react";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { icons } from "../Components/Icon/Icon";
 import { api, type MusicVideoListItem } from "../api";
 import { PageHeader, Tabs, Card, EmptyState, StatusPill } from "../components/ui";
 
@@ -65,7 +66,7 @@ function renderTable(
   if (!data || data.length === 0) {
     return (
       <EmptyState
-        icon={<AlertCircle />}
+        icon={<FontAwesomeIcon icon={icons.ALERT} />}
         title="All caught up"
         description={emptyMessage}
       />
@@ -96,7 +97,7 @@ function renderTable(
                 />
               ) : (
                 <div className="muted" style={{ display: "flex", alignItems: "center", justifyContent: "center", width: 56, height: 32, background: "var(--bg-panel-alt)", borderRadius: 2 }}>
-                  <Music size={16} />
+                  <FontAwesomeIcon icon={icons.MUSIC} />
                 </div>
               )}
             </td>
