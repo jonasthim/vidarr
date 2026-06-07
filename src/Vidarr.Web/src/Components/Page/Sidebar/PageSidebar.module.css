@@ -23,6 +23,17 @@
   margin: 0;
 }
 
+.sidebarItems ul,
+.linkGroup ul {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.linkGroup {
+  list-style: none;
+}
+
 @media only screen and (max-width: 768px) {
   .sidebarContainer {
     position: fixed;

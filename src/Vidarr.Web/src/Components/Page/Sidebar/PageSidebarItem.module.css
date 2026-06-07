@@ -1,13 +1,16 @@
 /* Adapted from Sonarr frontend/src/Components/Page/Sidebar/PageSidebarItem.css. GPL-3.0. */
 .item {
+  list-style: none;
   border-left: 3px solid transparent;
   color: var(--sidebarColor);
   transition: border-left 0.3s ease-in-out;
-  list-style: none;
 }
 
 .isActiveItem {
   border-left: 3px solid var(--themeAlternateBlue);
+}
+
+.isActiveParentItem {
   background-color: var(--sidebarActiveBackgroundColor);
 }
 
@@ -17,9 +20,14 @@
   color: var(--sidebarColor);
   text-decoration: none;
 }
-.link:hover {
+.link:hover,
+.link:focus {
   color: var(--themeBlue);
   text-decoration: none;
+}
+
+.childLink {
+  padding: 10px 24px 10px 35px;
 }
 
 .isActiveLink {

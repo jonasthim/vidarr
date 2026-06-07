@@ -1,4 +1,4 @@
-import { Navigate, NavLink, useParams } from "react-router-dom";
+import { Navigate, useParams } from "react-router-dom";
 import { PageHeader } from "../components/ui";
 import { ProfilesPanel } from "../components/ProfilesPanel";
 import { RootFoldersPanel } from "../components/RootFoldersPanel";
@@ -18,8 +18,6 @@ type SectionDef = {
   panel: () => JSX.Element;
 };
 
-// Order intentionally mirrors Sonarr's Settings nav as closely as Vidarr's
-// domain allows.
 const SECTIONS: SectionDef[] = [
   { slug: "mediamanagement", label: "Media Management", panel: GeneralSettingsPanel },
   { slug: "profiles",        label: "Profiles",         panel: ProfilesPanel },
@@ -41,27 +39,8 @@ export function SettingsPage(): JSX.Element {
   const Panel = active.panel;
   return (
     <>
-      <PageHeader title="Settings" subtitle={active.label} />
-      <div className="settings">
-        <nav className="settings-nav">
-          <h2>Settings</h2>
-          <ul>
-            {SECTIONS.map((s) => (
-              <li key={s.slug}>
-                <NavLink
-                  to={`/settings/${s.slug}`}
-                  className={({ isActive }) => (isActive ? "active" : "")}
-                >
-                  {s.label}
-                </NavLink>
-              </li>
-            ))}
-          </ul>
-        </nav>
-        <div className="settings-pane">
-          <Panel />
-        </div>
-      </div>
+      <PageHeader title={active.label} subtitle="Settings" />
+      <Panel />
     </>
   );
 }

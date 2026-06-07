@@ -3,55 +3,39 @@ import { useQuery } from "@tanstack/react-query";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { icons } from "../Components/Icon/Icon";
 import { api, type MusicVideoListItem } from "../api";
-import { PageHeader, Tabs, Card, EmptyState, StatusPill } from "../components/ui";
+import { PageHeader, Card, EmptyState, StatusPill } from "../components/ui";
 
-const TABS = [
-  { to: "/wanted/missing", label: "Missing" },
-  { to: "/wanted/cutoff",  label: "Cutoff Unmet" },
-];
+const TABS: Record<string, { label: string; query: keyof typeof TAB_QUERIES }> = {
+  missing: { label: "Missing",      query: "missing" },
+  cutoff:  { label: "Cutoff Unmet", query: "cutoff" },
+};
+
+const TAB_QUERIES = {
+  missing: { qfn: api.listMissing,      key: "wanted-missing" as const, emptyMessage: "Nothing missing — all monitored videos have files." },
+  cutoff:  { qfn: api.listCutoffUnmet,  key: "wanted-cutoff" as const,  emptyMessage: "No cutoff-unmet videos — every download meets its profile target." },
+};
 
 export function WantedPage(): JSX.Element {
   const { tab } = useParams<{ tab: string }>();
-  if (!tab) return <Navigate to="/wanted/missing" replace />;
-
+  if (!tab || !TABS[tab]) return <Navigate to="/wanted/missing" replace />;
+  const active = TABS[tab];
+  const q = TAB_QUERIES[active.query];
+  const { data, isLoading, error } = useQuery({
+    queryKey: [q.key],
+    queryFn: q.qfn,
+    refetchInterval: 30_000,
+  });
+  const description = tab === "cutoff"
+    ? "Videos that have a file, but the file's quality is below the artist's profile cutoff and would be upgraded if a better release is found."
+    : "Monitored music videos that don't yet have a file on disk.";
   return (
     <>
-      <PageHeader title="Wanted" />
-      <Tabs tabs={TABS} />
-      {tab === "missing" && <MissingTab />}
-      {tab === "cutoff"  && <CutoffTab />}
+      <PageHeader title={active.label} subtitle="Wanted" />
+      <Card title={active.label}>
+        <p className="muted">{description}</p>
+        {renderTable(data, isLoading, error, q.emptyMessage)}
+      </Card>
     </>
-  );
-}
-
-function MissingTab(): JSX.Element {
-  const { data, isLoading, error } = useQuery({
-    queryKey: ["wanted-missing"],
-    queryFn: api.listMissing,
-    refetchInterval: 30_000,
-  });
-  return (
-    <Card title="Missing">
-      <p className="muted">Monitored music videos that don't yet have a file on disk.</p>
-      {renderTable(data, isLoading, error, "Nothing missing — all monitored videos have files.")}
-    </Card>
-  );
-}
-
-function CutoffTab(): JSX.Element {
-  const { data, isLoading, error } = useQuery({
-    queryKey: ["wanted-cutoff"],
-    queryFn: api.listCutoffUnmet,
-    refetchInterval: 30_000,
-  });
-  return (
-    <Card title="Cutoff Unmet">
-      <p className="muted">
-        Videos that have a file, but the file's quality is below the artist's profile cutoff
-        and would be upgraded if a better release is found.
-      </p>
-      {renderTable(data, isLoading, error, "No cutoff-unmet videos — every download meets its profile target.")}
-    </Card>
   );
 }
 
@@ -96,9 +80,7 @@ function renderTable(
                   style={{ width: 56, height: 32, objectFit: "cover", borderRadius: 2 }}
                 />
               ) : (
-                <div className="muted" style={{ display: "flex", alignItems: "center", justifyContent: "center", width: 56, height: 32, background: "var(--bg-panel-alt)", borderRadius: 2 }}>
-                  <FontAwesomeIcon icon={icons.MUSIC} />
-                </div>
+                <FontAwesomeIcon icon={icons.MUSIC} />
               )}
             </td>
             <td>

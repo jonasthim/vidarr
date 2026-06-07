@@ -1,30 +1,26 @@
 import { Navigate, useParams } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
-import { PageHeader, Tabs, Card, StatusPill } from "../components/ui";
+import { PageHeader, Card, StatusPill } from "../components/ui";
 import { CommandsPage } from "./Commands";
 import { HealthPage } from "./Health";
 import { BackupPanel } from "../components/BackupPanel";
 import { api } from "../api";
 
-const TABS = [
-  { to: "/system/status", label: "Status" },
-  { to: "/system/tasks",  label: "Tasks" },
-  { to: "/system/health", label: "Health" },
-  { to: "/system/backup", label: "Backup" },
-];
+const TABS: Record<string, { label: string; render: () => JSX.Element }> = {
+  status: { label: "Status", render: () => <StatusTab /> },
+  tasks:  { label: "Tasks",  render: () => <CommandsPage /> },
+  health: { label: "Health", render: () => <HealthPage /> },
+  backup: { label: "Backup", render: () => <BackupPanel /> },
+};
 
 export function SystemPage(): JSX.Element {
   const { tab } = useParams<{ tab: string }>();
-  if (!tab) return <Navigate to="/system/status" replace />;
-
+  if (!tab || !TABS[tab]) return <Navigate to="/system/status" replace />;
+  const active = TABS[tab];
   return (
     <>
-      <PageHeader title="System" />
-      <Tabs tabs={TABS} />
-      {tab === "status" && <StatusTab />}
-      {tab === "tasks" && <CommandsPage />}
-      {tab === "health" && <HealthPage />}
-      {tab === "backup" && <BackupPanel />}
+      <PageHeader title={active.label} subtitle="System" />
+      {active.render()}
     </>
   );
 }
