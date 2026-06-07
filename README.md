@@ -77,15 +77,15 @@ Full design: [`docs/superpowers/specs/2026-06-06-vidarr-design.md`](docs/superpo
 
 ## Development
 
-Prerequisites: .NET 10 SDK, Node 20+, ffmpeg + yt-dlp on `PATH` for local runs.
+Prerequisites: .NET 10 SDK, Node 20+, ffmpeg + yt-dlp on `PATH`. Run `make check-tools` to verify.
 
 ```sh
-dotnet build
-dotnet test                                  # full suite + coverage
-cd src/Vidarr.Web && npm install && npm run dev   # Vite dev server
+make dev      # backend + Vite dev server in one terminal (Ctrl-C stops both)
+make test     # full suite (Release config, parity with CI)
+make help     # list every target
 ```
 
-Test discipline is strict TDD with a 95% line-coverage gate enforced in CI. See [`CLAUDE.md`](CLAUDE.md) for the conventions every change must follow.
+See [`docs/development.md`](docs/development.md) for the full local-dev guide — port layout, API-key flow, sample-data seeding, IDE setup, troubleshooting. Test discipline is strict TDD with a 95% line-coverage gate enforced in CI; see [`CLAUDE.md`](CLAUDE.md) for the conventions every change must follow.
 
 ## Project layout
 
