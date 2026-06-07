@@ -22,7 +22,10 @@ src/Vidarr.Host/wwwroot/
 
 # Editor / OS
 .idea/
-.vscode/
+.vscode/*
+# Share the launch + task configs with contributors but ignore personal prefs.
+!.vscode/launch.json
+!.vscode/tasks.json
 *.DS_Store
 Thumbs.db
 
