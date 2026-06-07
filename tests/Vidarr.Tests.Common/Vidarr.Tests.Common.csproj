@@ -1,5 +1,15 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
+  <PropertyGroup>
+    <!--
+      Vidarr.Tests.Common is a *library* of fakes shared by every Vidarr.*.Tests
+      project; it has no test classes of its own. Without this flag, `dotnet test`
+      at the solution level picks it up by name pattern and crashes the testhost
+      because there is no test SDK referenced here.
+    -->
+    <IsTestProject>false</IsTestProject>
+  </PropertyGroup>
+
   <ItemGroup>
     <ProjectReference Include="..\..\src\Vidarr.Contracts\Vidarr.Contracts.csproj" />
   </ItemGroup>
