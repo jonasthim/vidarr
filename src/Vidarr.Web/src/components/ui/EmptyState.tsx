@@ -1,4 +1,5 @@
 import { ReactNode } from "react";
+import styles from "./EmptyState.module.css";
 
 type Props = {
   icon?: ReactNode;
@@ -9,11 +10,11 @@ type Props = {
 
 export function EmptyState({ icon, title, description, action }: Props): JSX.Element {
   return (
-    <div className="empty-state">
-      {icon}
-      <h2>{title}</h2>
-      {description && <p>{description}</p>}
-      {action && <div style={{ marginTop: "var(--space-4)" }}>{action}</div>}
+    <div className={styles.empty}>
+      {icon && <div className={styles.icon}>{icon}</div>}
+      <h2 className={styles.title}>{title}</h2>
+      {description && <p className={styles.description}>{description}</p>}
+      {action && <div className={styles.action}>{action}</div>}
     </div>
   );
 }

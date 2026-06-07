@@ -1,4 +1,10 @@
+/*
+ * Shim: keeps the existing <PageHeader title=… actions=…/> API used across
+ * pages but renders in Sonarr's PageToolbar style (slate band, 60px tall, with
+ * a left section for the title and a right section for action buttons).
+ */
 import { ReactNode } from "react";
+import styles from "./PageHeader.module.css";
 
 type Props = {
   title: ReactNode;
@@ -8,12 +14,12 @@ type Props = {
 
 export function PageHeader({ title, subtitle, actions }: Props): JSX.Element {
   return (
-    <header className="page-header">
-      <div>
-        <h1>{title}</h1>
-        {subtitle && <div className="page-subtitle">{subtitle}</div>}
+    <div className={styles.toolbar}>
+      <div className={styles.left}>
+        <div className={styles.title}>{title}</div>
+        {subtitle && <div className={styles.subtitle}>{subtitle}</div>}
       </div>
-      {actions && <div className="toolbar">{actions}</div>}
-    </header>
+      <div className={styles.right}>{actions}</div>
+    </div>
   );
 }

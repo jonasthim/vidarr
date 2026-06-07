@@ -1,0 +1,32 @@
+.card {
+  background-color: var(--cardCenterBackgroundColor);
+  border-radius: 4px;
+  margin-bottom: 20px;
+  overflow: hidden;
+}
+
+.header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 12px 20px;
+  background-color: var(--themeDarkColor);
+  border-bottom: 1px solid var(--defaultBorderColor);
+}
+
+.title {
+  font-size: 16px;
+  font-weight: 500;
+  color: var(--white);
+  margin: 0;
+}
+
+.actions {
+  display: flex;
+  gap: 8px;
+}
+
+.body {
+  padding: 20px;
+}

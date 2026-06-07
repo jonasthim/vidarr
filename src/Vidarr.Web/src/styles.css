@@ -1,14 +1,17 @@
 @import "./Styles/fonts.css";
 @import "./Styles/variables.css";
-@import "./Styles/scaffolding.css";
 
 /*
- * Legacy CSS from the P1 hand-rolled design system, kept around until every
- * page in src/pages/ + every panel in src/components/*Panel.tsx is refactored
- * to the new Sonarr-derived Components/. Drop these imports once the migration
- * is done.
+ * Legacy CSS from the P1 hand-rolled design system, kept around so old
+ * page markup that still uses ".grid" / ".muted" / etc. doesn't lose all
+ * styling while the refactor lands page-by-page.
  */
 @import "./theme.css";
 @import "./layout.css";
 @import "./components.css";
 @import "./pages.css";
+
+/*
+ * Sonarr scaffolding comes LAST so it wins the body / a / button cascade.
+ */
+@import "./Styles/scaffolding.css";
