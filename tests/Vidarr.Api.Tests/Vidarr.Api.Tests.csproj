@@ -13,6 +13,7 @@
     <ProjectReference Include="..\..\src\Vidarr.EventBus\Vidarr.EventBus.csproj" />
     <ProjectReference Include="..\..\src\Vidarr.Health\Vidarr.Health.csproj" />
     <ProjectReference Include="..\..\src\Vidarr.Backup\Vidarr.Backup.csproj" />
+    <ProjectReference Include="..\..\src\Vidarr.Host\Vidarr.Host.csproj" />
     <ProjectReference Include="..\..\src\Vidarr.Catalog\Vidarr.Catalog.csproj" />
     <ProjectReference Include="..\..\src\Vidarr.DownloadClients\Vidarr.DownloadClients.csproj" />
     <ProjectReference Include="..\..\src\Vidarr.Indexers\Vidarr.Indexers.csproj" />

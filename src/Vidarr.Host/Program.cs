@@ -229,17 +229,25 @@ if (Directory.Exists(wwwroot))
     app.UseStaticFiles();
     if (indexHandler.Exists())
     {
-        app.MapFallback(async (HttpContext ctx, IApiKeyService keyService) =>
-            await (await indexHandler.RenderAsync(keyService, ctx.RequestAborted)).ExecuteAsync(ctx));
+        app.MapFallback(async (
+                HttpContext ctx,
+                IApiKeyService keyService,
+                Vidarr.Catalog.Repositories.IApplicationConfigRepository configRepo,
+                ISessionSigner signer) =>
+            await (await indexHandler.RenderAsync(ctx, keyService, configRepo, signer, ctx.RequestAborted))
+                .ExecuteAsync(ctx));
     }
 }
 
 Log.Information("Vidarr starting on {Url}", string.Join(",", app.Urls.Count > 0 ? app.Urls : ["default"]));
-using (var scope = app.Services.CreateScope())
+if (app.Environment.IsDevelopment())
 {
+    // Only print the full key in dev — production operators read it from the
+    // Settings > Security panel instead, so it doesn't sit in container logs.
+    using var scope = app.Services.CreateScope();
     var keyService = scope.ServiceProvider.GetRequiredService<IApiKeyService>();
     var startupKey = await keyService.GetCurrentAsync(default);
-    Log.Information("Vidarr API key: {Key}", startupKey);
+    Log.Information("Vidarr API key (dev): {Key}", startupKey);
 }
 
 await app.RunAsync();
