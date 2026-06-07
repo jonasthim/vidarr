@@ -119,6 +119,38 @@ public static class Endpoints
             return Results.Ok(list.Select(ToDto).ToArray());
         });
 
+        v1.MapGet("/wanted/missing", async (IMusicVideoRepository videos, CancellationToken ct) =>
+        {
+            var list = await videos.ListWantedAsync(ct);
+            return Results.Ok(list.Select(ToListItemDto).ToArray());
+        });
+
+        v1.MapGet("/wanted/cutoff", async (IMusicVideoRepository videos, CancellationToken ct) =>
+        {
+            var list = await videos.ListCutoffUnmetAsync(ct);
+            return Results.Ok(list.Select(ToListItemDto).ToArray());
+        });
+
+        v1.MapGet("/calendar", async (
+            DateTimeOffset? from,
+            DateTimeOffset? to,
+            IMusicVideoRepository videos,
+            CancellationToken ct) =>
+        {
+            if (from is null || to is null)
+            {
+                return Results.BadRequest(new ApiErrorResponse(
+                    [new ApiError("range", "from and to query parameters are required (ISO-8601)")]));
+            }
+            if (to < from)
+            {
+                return Results.BadRequest(new ApiErrorResponse(
+                    [new ApiError("range", "to must be >= from")]));
+            }
+            var list = await videos.ListByReleaseRangeAsync(from.Value, to.Value, ct);
+            return Results.Ok(list.Select(ToListItemDto).ToArray());
+        });
+
         v1.MapPost("/command", async (CommandRequest req, ICommandQueue queue, CancellationToken ct) =>
         {
             ICommand cmd = req.Name switch
@@ -289,4 +321,17 @@ public static class Endpoints
             v.Monitored,
             v.HasFile,
             ParseStringArray(v.GenresJson));
+
+    internal static MusicVideoListItemDto ToListItemDto(MusicVideo v) =>
+        new(
+            v.Id,
+            v.ArtistId,
+            v.Artist?.Name ?? string.Empty,
+            v.Title,
+            v.Year,
+            v.ReleaseDate,
+            v.Type,
+            v.ThumbnailUrl,
+            v.Monitored,
+            v.HasFile);
 }

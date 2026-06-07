@@ -159,6 +159,88 @@
   gap: var(--space-3);
 }
 
+/* Calendar */
+.calendar {
+  display: grid;
+  gap: 1px;
+  background: var(--border);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  overflow: hidden;
+}
+.calendar-head {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  background: var(--bg-panel-alt);
+  color: var(--text-muted);
+  font-size: var(--fs-sm);
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+.calendar-head > div {
+  padding: var(--space-2) var(--space-3);
+  text-align: left;
+}
+.calendar-grid {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 1px;
+}
+.calendar-cell {
+  background: var(--bg-panel);
+  min-height: 96px;
+  padding: var(--space-2);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+}
+.calendar-cell-empty {
+  background: var(--bg-app);
+}
+.calendar-cell.today {
+  background: linear-gradient(0deg, var(--accent-fg) 0%, var(--bg-panel) 6px);
+  border-top: 2px solid var(--accent);
+  padding-top: calc(var(--space-2) - 2px);
+}
+.calendar-day {
+  font-weight: 600;
+  color: var(--text-strong);
+  font-size: var(--fs-sm);
+}
+.calendar-event {
+  display: block;
+  background: var(--bg-panel-alt);
+  border-left: 3px solid var(--text-muted);
+  padding: 4px 6px;
+  border-radius: 2px;
+  color: var(--text);
+  text-decoration: none;
+  font-size: var(--fs-sm);
+  line-height: 1.2;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.calendar-event:hover { background: var(--border); }
+.calendar-event.downloaded { border-left-color: var(--success); }
+.calendar-event.wanted     { border-left-color: var(--warning); }
+.calendar-event.ignored    { border-left-color: var(--text-muted); }
+.calendar-event-artist {
+  display: block;
+  font-weight: 600;
+  color: var(--text-strong);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.calendar-event-title {
+  display: block;
+  color: var(--text-muted);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
 /* Artist hero (detail page) */
 .artist-hero {
   display: grid;

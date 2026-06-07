@@ -4,8 +4,8 @@ import { RequireAuth } from "./components/RequireAuth";
 import { LibraryPage } from "./pages/Library";
 import { AddArtistPage } from "./pages/AddArtist";
 import { ActivityPage } from "./pages/Activity";
-import { CalendarPlaceholder } from "./pages/CalendarPlaceholder";
-import { WantedPlaceholder } from "./pages/WantedPlaceholder";
+import { CalendarPage } from "./pages/Calendar";
+import { WantedPage } from "./pages/Wanted";
 import { SettingsPage } from "./pages/Settings";
 import { SystemPage } from "./pages/System";
 import { LoginPage } from "./pages/Login";
@@ -21,12 +21,15 @@ export function App(): JSX.Element {
           <Route path="library" element={<LibraryPage />} />
           <Route path="library/:artistId" element={<ArtistDetail />} />
           <Route path="add" element={<AddArtistPage />} />
-          <Route path="calendar" element={<CalendarPlaceholder />} />
+          <Route path="calendar" element={<CalendarPage />} />
           <Route path="activity">
             <Route index element={<Navigate to="/activity/queue" replace />} />
             <Route path=":tab" element={<ActivityPage />} />
           </Route>
-          <Route path="wanted" element={<WantedPlaceholder />} />
+          <Route path="wanted">
+            <Route index element={<Navigate to="/wanted/missing" replace />} />
+            <Route path=":tab" element={<WantedPage />} />
+          </Route>
           <Route path="settings">
             <Route index element={<Navigate to="/settings/mediamanagement" replace />} />
             <Route path=":section" element={<SettingsPage />} />

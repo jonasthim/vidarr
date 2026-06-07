@@ -18,6 +18,10 @@ public interface IMusicVideoRepository
     Task<MusicVideo?> GetAsync(int id, CancellationToken ct);
     Task<IReadOnlyList<MusicVideo>> ListByArtistAsync(int artistId, CancellationToken ct);
     Task<IReadOnlyList<MusicVideo>> ListWantedAsync(CancellationToken ct);
+    /// <summary>Monitored videos that have a file whose quality is below the artist's profile cutoff.</summary>
+    Task<IReadOnlyList<MusicVideo>> ListCutoffUnmetAsync(CancellationToken ct);
+    /// <summary>Videos whose ReleaseDate (or Year, if no exact date) falls in [from, to]. Both inclusive.</summary>
+    Task<IReadOnlyList<MusicVideo>> ListByReleaseRangeAsync(DateTimeOffset from, DateTimeOffset to, CancellationToken ct);
     Task<MusicVideo> AddAsync(MusicVideo video, CancellationToken ct);
     Task UpdateAsync(MusicVideo video, CancellationToken ct);
 }
@@ -85,7 +89,54 @@ public sealed class MusicVideoRepository(VidarrDbContext db) : IMusicVideoReposi
         await db.MusicVideos.Where(v => v.ArtistId == artistId).OrderBy(v => v.Year).ThenBy(v => v.Title).ToListAsync(ct);
 
     public async Task<IReadOnlyList<MusicVideo>> ListWantedAsync(CancellationToken ct) =>
-        await db.MusicVideos.Where(v => v.Monitored && !v.HasFile).ToListAsync(ct);
+        await db.MusicVideos
+            .Include(v => v.Artist)
+            .Where(v => v.Monitored && !v.HasFile)
+            .OrderBy(v => v.ArtistId)
+            .ThenBy(v => v.Year)
+            .ThenBy(v => v.Title)
+            .ToListAsync(ct);
+
+    public async Task<IReadOnlyList<MusicVideo>> ListCutoffUnmetAsync(CancellationToken ct)
+    {
+        // For each monitored downloaded video, the file.QualityId must be >= the artist's
+        // profile cutoff. We join through the relational shape directly so EF Core
+        // translates this to a single SQL statement.
+        var query =
+            from v in db.MusicVideos
+            join f in db.MusicVideoFiles on v.FileId equals f.Id
+            join a in db.Artists on v.ArtistId equals a.Id
+            join p in db.QualityProfiles on a.QualityProfileId equals p.Id
+            where v.Monitored && v.HasFile && f.QualityId < p.CutoffQualityId
+            select v;
+        return await query
+            .Include(v => v.File)
+            .Include(v => v.Artist)
+            .OrderBy(v => v.ArtistId)
+            .ThenBy(v => v.Year)
+            .ThenBy(v => v.Title)
+            .ToListAsync(ct);
+    }
+
+    public async Task<IReadOnlyList<MusicVideo>> ListByReleaseRangeAsync(DateTimeOffset from, DateTimeOffset to, CancellationToken ct)
+    {
+        // Year acts as a coarse "premiere date" when no exact ReleaseDate is recorded —
+        // surfacing year-only entries lets the Calendar show legacy/back-catalog videos.
+        var fromYear = from.Year;
+        var toYear = to.Year;
+        var rows = await db.MusicVideos
+            .Include(v => v.Artist)
+            .Where(v =>
+                (v.ReleaseDate != null && v.ReleaseDate >= from && v.ReleaseDate <= to)
+                || (v.ReleaseDate == null && v.Year != null && v.Year >= fromYear && v.Year <= toYear))
+            .ToListAsync(ct);
+        // Sort in memory: EF Core can't translate the year-fallback DateTimeOffset
+        // ctor to SQL. The result set for a calendar query is bounded by month/year,
+        // so post-processing is cheap.
+        return [.. rows.OrderBy(v =>
+                v.ReleaseDate ?? new DateTimeOffset(v.Year!.Value, 1, 1, 0, 0, 0, TimeSpan.Zero))
+            .ThenBy(v => v.Title)];
+    }
 
     public async Task<MusicVideo> AddAsync(MusicVideo video, CancellationToken ct)
     {

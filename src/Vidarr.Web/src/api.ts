@@ -33,6 +33,19 @@ export type ArtistDetailsDto = {
   downloadedCount: number;
 };
 
+export type MusicVideoListItem = {
+  id: number;
+  artistId: number;
+  artistName: string;
+  title: string;
+  year?: number | null;
+  releaseDate?: string | null;
+  type: string;
+  thumbnailUrl?: string | null;
+  monitored: boolean;
+  hasFile: boolean;
+};
+
 export type MusicVideoDto = {
   id: number;
   artistId: number;
@@ -238,6 +251,14 @@ export const api = {
   listArtists: () => call<ArtistDto[]>("/artist"),
   getArtist: (id: number) => call<ArtistDto>(`/artist/${id}`),
   getArtistDetails: (id: number) => call<ArtistDetailsDto>(`/artist/${id}/details`),
+
+  // wanted + calendar (P3)
+  listMissing: () => call<MusicVideoListItem[]>("/wanted/missing"),
+  listCutoffUnmet: () => call<MusicVideoListItem[]>("/wanted/cutoff"),
+  listCalendar: (fromIso: string, toIso: string) =>
+    call<MusicVideoListItem[]>(
+      `/calendar?from=${encodeURIComponent(fromIso)}&to=${encodeURIComponent(toIso)}`,
+    ),
   listMusicVideos: (artistId: number) =>
     call<MusicVideoDto[]>(`/musicvideo?artistId=${artistId}`),
   triggerArtistSearch: (artistId: number) =>

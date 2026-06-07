@@ -57,6 +57,19 @@ public sealed record MusicVideoDto(
     IReadOnlyList<string> Genres);
 
 [ExcludeFromCodeCoverage(Justification = "Plain transport DTOs.")]
+public sealed record MusicVideoListItemDto(
+    int Id,
+    int ArtistId,
+    string ArtistName,
+    string Title,
+    int? Year,
+    DateTimeOffset? ReleaseDate,
+    MusicVideoType Type,
+    string? ThumbnailUrl,
+    bool Monitored,
+    bool HasFile);
+
+[ExcludeFromCodeCoverage(Justification = "Plain transport DTOs.")]
 public sealed record CommandRequest(string Name, int? ArtistId, int? MusicVideoId);
 
 [ExcludeFromCodeCoverage(Justification = "Plain transport DTOs.")]

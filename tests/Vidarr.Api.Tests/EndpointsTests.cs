@@ -200,6 +200,84 @@ public class EndpointsTests : IDisposable
     }
 
     [Fact]
+    public async Task Wanted_missing_returns_monitored_videos_with_no_file()
+    {
+        await SeedArtistAndVideosAsync("Tester", new[] {
+            ("Video A", year: (int?)2024, monitored: true, hasFile: false),
+            ("Video B", year: (int?)2024, monitored: true, hasFile: true),
+            ("Video C", year: (int?)2024, monitored: false, hasFile: false),
+        });
+
+        var resp = await _client.GetAsync(new Uri("http://localhost/api/v1/wanted/missing"));
+        resp.StatusCode.Should().Be(HttpStatusCode.OK);
+        var items = await resp.Content.ReadFromJsonAsync<MusicVideoListItemDto[]>();
+        items!.Should().ContainSingle()
+            .Which.Title.Should().Be("Video A");
+        items![0].ArtistName.Should().Be("Tester");
+    }
+
+    [Fact]
+    public async Task Calendar_returns_videos_in_release_range()
+    {
+        await SeedArtistAndVideosAsync("Cal", new[] {
+            ("Early",  year: (int?)2023, monitored: true, hasFile: false),
+            ("Mid",    year: (int?)2024, monitored: true, hasFile: false),
+            ("Future", year: (int?)2026, monitored: true, hasFile: false),
+        });
+
+        var resp = await _client.GetAsync(new Uri(
+            "http://localhost/api/v1/calendar?from=2024-01-01T00:00:00Z&to=2025-12-31T23:59:59Z"));
+        resp.StatusCode.Should().Be(HttpStatusCode.OK);
+        var items = await resp.Content.ReadFromJsonAsync<MusicVideoListItemDto[]>();
+        items!.Should().ContainSingle().Which.Title.Should().Be("Mid");
+    }
+
+    [Fact]
+    public async Task Calendar_rejects_missing_range()
+    {
+        var resp = await _client.GetAsync(new Uri("http://localhost/api/v1/calendar"));
+        resp.StatusCode.Should().Be(HttpStatusCode.BadRequest);
+    }
+
+    [Fact]
+    public async Task Calendar_rejects_inverted_range()
+    {
+        var resp = await _client.GetAsync(new Uri(
+            "http://localhost/api/v1/calendar?from=2025-01-01T00:00:00Z&to=2024-01-01T00:00:00Z"));
+        resp.StatusCode.Should().Be(HttpStatusCode.BadRequest);
+    }
+
+    private async Task SeedArtistAndVideosAsync(
+        string artistName,
+        IEnumerable<(string Title, int? Year, bool Monitored, bool HasFile)> videos)
+    {
+        using var scope = _host.Services.CreateScope();
+        var db = scope.ServiceProvider.GetRequiredService<VidarrDbContext>();
+        var artist = new Vidarr.Catalog.Entities.Artist
+        {
+            Name = artistName,
+            SortName = artistName,
+            RootFolderPath = "/lib",
+            Monitored = true,
+            QualityProfileId = 1,
+        };
+        db.Artists.Add(artist);
+        await db.SaveChangesAsync();
+        foreach (var v in videos)
+        {
+            db.MusicVideos.Add(new Vidarr.Catalog.Entities.MusicVideo
+            {
+                ArtistId = artist.Id,
+                Title = v.Title,
+                Year = v.Year,
+                Monitored = v.Monitored,
+                HasFile = v.HasFile,
+            });
+        }
+        await db.SaveChangesAsync();
+    }
+
+    [Fact]
     public async Task List_music_videos_without_artist_id_returns_400()
     {
         var resp = await _client.GetAsync(new Uri("http://localhost/api/v1/musicvideo"));
