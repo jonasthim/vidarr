@@ -1,0 +1,158 @@
+/* Adapted from Sonarr (GPL-3.0) — SeriesIndexPoster pattern. */
+.content {
+  display: flex;
+  flex-direction: column;
+  transition: all 200ms ease-in;
+  position: relative;
+}
+
+.content:hover {
+  z-index: 2;
+  box-shadow: 0 0 12px var(--black);
+}
+
+.content:hover .controls {
+  opacity: 0.92;
+  transition: opacity 200ms linear 150ms;
+}
+
+.posterContainer {
+  position: relative;
+}
+
+.link {
+  position: relative;
+  display: block;
+  background-color: var(--cardCenterBackgroundColor);
+  text-decoration: none;
+  color: var(--textColor);
+}
+
+.poster {
+  display: block;
+  width: 100%;
+  aspect-ratio: 2 / 3;
+  object-fit: cover;
+  background-color: var(--themeDarkColor);
+}
+
+.posterFallback {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  aspect-ratio: 2 / 3;
+  background-color: var(--themeDarkColor);
+  color: var(--helpTextColor);
+  font-size: 48px;
+}
+
+.overlayTitle {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 5px;
+  color: var(--offWhite);
+  text-align: center;
+  font-size: 20px;
+  font-weight: 500;
+  background-color: rgba(0, 0, 0, 0.55);
+  opacity: 0;
+  transition: opacity 200ms ease-in;
+}
+
+.posterContainer:hover .overlayTitle { opacity: 1; }
+
+/* Corner status badge — top-right CSS triangle. */
+.status {
+  position: absolute;
+  top: 0;
+  right: 0;
+  z-index: 1;
+  width: 0;
+  height: 0;
+  border-width: 0 30px 30px 0;
+  border-style: solid;
+}
+
+.statusUnmonitored {
+  border-color: transparent var(--gray) transparent transparent;
+}
+
+.statusMonitored {
+  border-color: transparent var(--successColor) transparent transparent;
+}
+
+/* Hover controls — bottom-left over the poster. */
+.controls {
+  position: absolute;
+  bottom: 10px;
+  left: 10px;
+  z-index: 3;
+  display: flex;
+  gap: 4px;
+  padding: 4px;
+  border-radius: 4px;
+  background-color: rgba(79, 86, 111, 0.85);
+  color: var(--white);
+  opacity: 0;
+  transition: opacity 0;
+}
+
+.action {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+  height: 24px;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: var(--white);
+  cursor: pointer;
+  font-size: 14px;
+}
+.action:hover { color: var(--sonarrBlue); }
+
+/* Progress bar at the bottom of the poster. */
+.progressBar {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: var(--progressBarSmallHeight);
+  background-color: rgba(0, 0, 0, 0.4);
+  overflow: hidden;
+}
+
+.progressBarFill {
+  height: 100%;
+  background-color: var(--primaryColor);
+  transition: width 200ms ease-in;
+}
+
+/* Title strip below the poster. */
+.title {
+  padding: 6px 8px;
+  background-color: var(--cardCenterBackgroundColor);
+  color: var(--white);
+  text-align: center;
+  font-size: var(--smallFontSize);
+  font-weight: 500;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.tagline {
+  padding: 0 8px 6px;
+  background-color: var(--cardCenterBackgroundColor);
+  color: var(--helpTextColor);
+  text-align: center;
+  font-size: var(--extraSmallFontSize);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}

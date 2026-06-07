@@ -334,19 +334,6 @@ kbd {
   gap: 16px;
 }
 
-.artist-card {
-  background-color: var(--cardCenterBackgroundColor) !important;
-  border: 1px solid var(--defaultBorderColor) !important;
-  border-radius: 4px !important;
-  color: var(--textColor) !important;
-  text-decoration: none !important;
-}
-.artist-card:hover {
-  border-color: var(--sonarrBlue) !important;
-}
-.artist-card-poster {
-  background-color: var(--themeDarkColor) !important;
-}
 .artist-card-poster-fallback {
   color: var(--helpTextColor) !important;
 }
@@ -354,30 +341,12 @@ kbd {
   width: 48px;
   height: 48px;
 }
-.artist-card-body {
-  padding: 12px !important;
-}
-.artist-card-name {
-  font-weight: 500 !important;
-  color: var(--white) !important;
-}
 
 .banner-grid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(380px, 1fr));
   gap: 16px;
 }
-.artist-banner {
-  background-color: var(--cardCenterBackgroundColor) !important;
-  border: 1px solid var(--defaultBorderColor) !important;
-  border-radius: 4px !important;
-  color: var(--textColor) !important;
-  text-decoration: none !important;
-}
-.artist-banner:hover { border-color: var(--sonarrBlue) !important; }
-.artist-banner-image { background-color: var(--themeDarkColor) !important; }
-.artist-banner-name { color: var(--white) !important; font-weight: 500 !important; }
-.artist-banner-meta { color: var(--helpTextColor) !important; }
 
 /* Artist hero (detail page) */
 .artist-hero {
