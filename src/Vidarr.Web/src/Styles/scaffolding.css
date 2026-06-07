@@ -255,6 +255,70 @@ kbd {
   padding-left: 13px;
 }
 
+/* Restructure Settings layout to mirror Sonarr's sidebar sub-nav exactly. */
+.settings {
+  display: grid;
+  grid-template-columns: 220px 1fr;
+  gap: 0;
+  background-color: transparent;
+  min-height: calc(100vh - var(--headerHeight) - var(--toolbarHeight) - 60px);
+}
+
+.settings-nav {
+  background-color: var(--cardCenterBackgroundColor);
+  border: 1px solid var(--defaultBorderColor);
+  border-radius: 4px;
+  margin-right: 20px;
+  height: max-content;
+  overflow: hidden;
+}
+
+.settings-nav h2 {
+  margin: 0;
+  padding: 14px 16px;
+  background-color: var(--themeDarkColor);
+  color: var(--white);
+  font-size: 14px;
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  border-bottom: 1px solid var(--defaultBorderColor);
+}
+
+.settings-nav ul {
+  list-style: none;
+  margin: 0;
+  padding: 8px 0;
+}
+
+.settings-nav li {
+  margin: 0;
+}
+
+.settings-nav a {
+  display: block;
+  padding: 10px 16px;
+  color: var(--textColor);
+  border-left: 3px solid transparent;
+  text-decoration: none;
+  font-size: 14px;
+}
+
+.settings-nav a:hover {
+  color: var(--sonarrBlue);
+  background-color: var(--sidebarActiveBackgroundColor);
+}
+
+.settings-nav a.active {
+  color: var(--white);
+  background-color: var(--sidebarActiveBackgroundColor);
+  border-left-color: var(--themeAlternateBlue);
+}
+
+.settings-pane {
+  min-width: 0;
+}
+
 /* Library list / view chrome overrides — keep the layout, swap colors. */
 .library-toolbar {
   background-color: var(--themeDarkColor) !important;
@@ -405,11 +469,39 @@ kbd {
 /* Login screen */
 .login-shell {
   background-color: var(--pageBackground) !important;
+  min-height: 100vh !important;
 }
 .login-card {
   background-color: var(--cardCenterBackgroundColor) !important;
   border: 1px solid var(--defaultBorderColor) !important;
   border-radius: 4px !important;
+  min-width: 360px !important;
+  padding: 32px 40px !important;
+}
+.login-card h1 {
+  color: var(--white) !important;
+  text-align: center;
+  font-size: 26px;
+  margin: 0 0 8px;
+}
+.login-card h1::after {
+  content: "";
+}
+.login-card .login-sub {
+  text-align: center;
+  margin: 0 0 20px !important;
+  color: var(--helpTextColor) !important;
+}
+.login-card label > span {
+  display: block;
+  margin-bottom: 4px;
+  color: var(--helpTextColor);
+  font-size: var(--smallFontSize);
+}
+.login-card button[type="submit"] {
+  margin-top: 8px;
+  width: 100%;
+  justify-content: center;
 }
 
 /* Loading state */
