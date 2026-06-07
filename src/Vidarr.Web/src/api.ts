@@ -46,12 +46,36 @@ async function call<T>(path: string, init?: RequestInit): Promise<T> {
   if (API_KEY) headers.set("X-Api-Key", API_KEY);
   headers.set("Accept", "application/json");
   if (init?.body) headers.set("Content-Type", "application/json");
-  const resp = await fetch(`/api/v1${path}`, { ...init, headers });
+  const resp = await fetch(`/api/v1${path}`, {
+    credentials: "same-origin",
+    ...init,
+    headers,
+  });
   if (!resp.ok) {
     throw new Error(`HTTP ${resp.status}: ${await resp.text()}`);
   }
+  if (resp.status === 204) return undefined as T;
   return (await resp.json()) as T;
 }
+
+export type AuthStatus = {
+  method: string;
+  enabled: boolean;
+  authenticated: boolean;
+  username?: string | null;
+};
+
+export type HealthIssue = {
+  checkName: string;
+  source: string;
+  severity: "Info" | "Warning" | "Error";
+  message: string;
+};
+
+export type HealthStatus = {
+  lastRun?: string | null;
+  issues: HealthIssue[];
+};
 
 export type Quality = {
   id: number;
@@ -336,6 +360,19 @@ export const api = {
     call<JobRun[]>(`/system/jobs/runs${job ? `?job=${job}` : ""}`),
   listHistory: (artistId?: number) =>
     call<HistoryItem[]>(`/history${artistId ? `?artistId=${artistId}` : ""}`),
+
+  // auth
+  getAuthStatus: () => call<AuthStatus>("/auth/status"),
+  login: (username: string, password: string) =>
+    call<AuthStatus>("/auth/login", {
+      method: "POST",
+      body: JSON.stringify({ username, password }),
+    }),
+  logout: () => call<void>("/auth/logout", { method: "POST" }),
+
+  // health
+  getHealth: () => call<HealthStatus>("/health"),
+  runHealth: () => call<HealthStatus>("/health/run", { method: "POST" }),
 
   // download clients
   listDownloadClients: () => call<DownloadClientConfigDto[]>("/downloadclient"),
