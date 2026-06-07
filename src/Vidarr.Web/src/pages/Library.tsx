@@ -1,10 +1,13 @@
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { Music, RefreshCw, Search } from "lucide-react";
 import { api, type ReleaseSearchItem } from "../api";
+import { PageHeader, Card, StatusPill, EmptyState } from "../components/ui";
 
 export function LibraryPage(): JSX.Element {
   const [selectedArtistId, setSelectedArtistId] = useState<number | null>(null);
   const [channelsDraft, setChannelsDraft] = useState<string>("");
+  const [filter, setFilter] = useState("");
   const queryClient = useQueryClient();
 
   const artists = useQuery({
@@ -62,130 +65,230 @@ export function LibraryPage(): JSX.Element {
     onSuccess: () => queryClient.invalidateQueries({ queryKey: ["queue"] }),
   });
 
+  const filtered = useMemo(() => {
+    if (!artists.data) return [];
+    if (!filter) return artists.data;
+    const lower = filter.toLowerCase();
+    return artists.data.filter((a) => a.name.toLowerCase().includes(lower));
+  }, [artists.data, filter]);
+
   return (
-    <section className="library">
-      <div className="artists">
-        <h2>Artists ({artists.data?.length ?? 0})</h2>
-        {artists.isLoading && <p>Loading...</p>}
-        <ul>
-          {artists.data?.map((a) => (
-            <li
-              key={a.id}
-              onClick={() => setSelectedArtistId(a.id)}
-              className={selectedArtistId === a.id ? "selected" : ""}
-              role="button"
-              tabIndex={0}
-              onKeyDown={(e) => {
-                if (e.key === "Enter") setSelectedArtistId(a.id);
-              }}
+    <>
+      <PageHeader
+        title="Library"
+        subtitle={`${artists.data?.length ?? 0} artist${artists.data?.length === 1 ? "" : "s"} monitored`}
+        actions={
+          selectedArtistId !== null && (
+            <button
+              type="button"
+              className="primary"
+              disabled={search.isPending}
+              onClick={() => search.mutate(selectedArtistId)}
             >
-              <strong>{a.name}</strong>
-              {a.country && <span> · {a.country}</span>}
-            </li>
-          ))}
-        </ul>
-      </div>
-      <div className="videos">
-        {selectedArtistId !== null && (
-          <>
-            <header>
-              <h2>Videos</h2>
-              <button
-                type="button"
-                disabled={search.isPending}
-                onClick={() => search.mutate(selectedArtistId)}
-              >
-                Search now
-              </button>
-            </header>
+              <Search size={14} />
+              {search.isPending ? "Searching…" : "Search now"}
+            </button>
+          )
+        }
+      />
 
-            <section className="youtube-channels">
-              <label>
-                YouTube channels (comma-separated UC… IDs)
-                <input
-                  value={channelsDraft}
-                  onChange={(e) => setChannelsDraft(e.target.value)}
-                  placeholder="UCabc, UCdef"
-                />
-              </label>
-              <button
-                type="button"
-                disabled={saveChannels.isPending}
-                onClick={() =>
-                  saveChannels.mutate({
-                    id: selectedArtistId,
-                    channels: channelsDraft
-                      .split(",")
-                      .map((c) => c.trim())
-                      .filter(Boolean),
-                  })
-                }
+      <div className="library-grid">
+        <div className="library-list">
+          <div className="library-list-toolbar">
+            <Search size={14} className="muted" />
+            <input
+              type="search"
+              placeholder="Filter artists…"
+              value={filter}
+              onChange={(e) => setFilter(e.target.value)}
+            />
+          </div>
+          {artists.isLoading && <div className="loading-state">Loading…</div>}
+          {artists.data && artists.data.length === 0 && (
+            <EmptyState
+              icon={<Music />}
+              title="No artists yet"
+              description="Use Add Artist to start your library."
+            />
+          )}
+          <ul>
+            {filtered.map((a) => (
+              <li
+                key={a.id}
+                onClick={() => setSelectedArtistId(a.id)}
+                className={selectedArtistId === a.id ? "selected" : ""}
+                role="button"
+                tabIndex={0}
+                onKeyDown={(e) => {
+                  if (e.key === "Enter") setSelectedArtistId(a.id);
+                }}
               >
-                Save channels
-              </button>
-            </section>
-            <ul>
-              {videos.data?.map((v) => (
-                <li key={v.id}>
-                  <strong>{v.title}</strong>
-                  {v.year && <span> ({v.year})</span>} ·{" "}
-                  {v.hasFile ? "downloaded" : v.monitored ? "wanted" : "ignored"}
-                  <button
-                    type="button"
-                    onClick={() => {
-                      setSearchVideoId(v.id);
-                      setSearchResults([]);
-                      interactive.mutate({ artistId: selectedArtistId, musicVideoId: v.id });
-                    }}
-                  >
-                    Interactive search
-                  </button>
-                </li>
-              ))}
-            </ul>
+                <div>
+                  <strong>{a.name}</strong>
+                  {a.country && <span className="muted"> · {a.country}</span>}
+                </div>
+                <StatusPill variant={a.monitored ? "monitored" : "unmonitored"}>
+                  {a.monitored ? "Monitored" : "Unmonitored"}
+                </StatusPill>
+              </li>
+            ))}
+          </ul>
+        </div>
 
-            {searchVideoId !== null && (
-              <section className="interactive-search">
-                <h3>Releases for video #{searchVideoId}</h3>
-                {interactive.isPending && <p>Searching…</p>}
-                {searchResults.length === 0 && !interactive.isPending && <p>No results yet.</p>}
-                <table>
-                  <thead>
-                    <tr>
-                      <th>Title</th>
-                      <th>Indexer</th>
-                      <th>Protocol</th>
-                      <th>Seeders</th>
-                      <th>Size</th>
-                      <th />
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {searchResults.map((r, idx) => (
-                      <tr key={idx}>
-                        <td>{r.title}</td>
-                        <td>{r.indexerName}</td>
-                        <td>{r.protocol}</td>
-                        <td>{r.seeders ?? "—"}</td>
-                        <td>{r.sizeBytes ? `${(r.sizeBytes / 1_000_000).toFixed(1)} MB` : "—"}</td>
-                        <td>
-                          <button
-                            type="button"
-                            disabled={grab.isPending}
-                            onClick={() => grab.mutate(r)}
-                          >
-                            Grab
-                          </button>
-                        </td>
+        <div className="library-detail">
+          {selectedArtistId === null ? (
+            <EmptyState
+              icon={<Music />}
+              title="Select an artist"
+              description="Pick an artist on the left to see their videos and trigger searches."
+            />
+          ) : (
+            <>
+              <Card title="YouTube channels">
+                <div className="form-row">
+                  <label htmlFor="yt-channels">
+                    Comma-separated channel IDs (UC…). Used for RSS sync.
+                  </label>
+                  <input
+                    id="yt-channels"
+                    value={channelsDraft}
+                    onChange={(e) => setChannelsDraft(e.target.value)}
+                    placeholder="UCabc, UCdef"
+                  />
+                </div>
+                <button
+                  type="button"
+                  className="primary"
+                  disabled={saveChannels.isPending}
+                  onClick={() =>
+                    saveChannels.mutate({
+                      id: selectedArtistId,
+                      channels: channelsDraft.split(",").map((c) => c.trim()).filter(Boolean),
+                    })
+                  }
+                >
+                  Save channels
+                </button>
+              </Card>
+
+              <Card title={`Music videos (${videos.data?.length ?? 0})`}>
+                {videos.isLoading && <div className="loading-state">Loading…</div>}
+                {videos.data && videos.data.length === 0 && (
+                  <EmptyState
+                    icon={<Music />}
+                    title="No videos yet"
+                    description="Trigger Search now to pull from configured indexers."
+                  />
+                )}
+                {videos.data && videos.data.length > 0 && (
+                  <table className="grid">
+                    <thead>
+                      <tr>
+                        <th>Title</th>
+                        <th>Year</th>
+                        <th>Status</th>
+                        <th></th>
                       </tr>
-                    ))}
-                  </tbody>
-                </table>
-              </section>
-            )}
-          </>
-        )}
+                    </thead>
+                    <tbody>
+                      {videos.data.map((v) => (
+                        <tr key={v.id}>
+                          <td>{v.title}</td>
+                          <td>{v.year ?? "—"}</td>
+                          <td>
+                            {v.hasFile ? (
+                              <StatusPill variant="success">Downloaded</StatusPill>
+                            ) : v.monitored ? (
+                              <StatusPill variant="warning">Wanted</StatusPill>
+                            ) : (
+                              <StatusPill variant="unmonitored">Ignored</StatusPill>
+                            )}
+                          </td>
+                          <td className="actions">
+                            <button
+                              type="button"
+                              onClick={() => {
+                                setSearchVideoId(v.id);
+                                setSearchResults([]);
+                                interactive.mutate({ artistId: selectedArtistId, musicVideoId: v.id });
+                              }}
+                            >
+                              <Search size={14} />
+                              Interactive search
+                            </button>
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                )}
+              </Card>
+
+              {searchVideoId !== null && (
+                <Card
+                  title={`Releases for video #${searchVideoId}`}
+                  actions={
+                    <button
+                      type="button"
+                      className="ghost"
+                      onClick={() => {
+                        setSearchVideoId(null);
+                        setSearchResults([]);
+                      }}
+                    >
+                      Close
+                    </button>
+                  }
+                >
+                  {interactive.isPending && <div className="loading-state">Searching…</div>}
+                  {!interactive.isPending && searchResults.length === 0 && (
+                    <EmptyState
+                      icon={<RefreshCw />}
+                      title="No releases"
+                      description="No indexer returned a match. Verify indexer config and try again."
+                    />
+                  )}
+                  {searchResults.length > 0 && (
+                    <table className="grid">
+                      <thead>
+                        <tr>
+                          <th>Title</th>
+                          <th>Indexer</th>
+                          <th>Protocol</th>
+                          <th>Seeders</th>
+                          <th>Size</th>
+                          <th></th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {searchResults.map((r, idx) => (
+                          <tr key={idx}>
+                            <td>{r.title}</td>
+                            <td>{r.indexerName}</td>
+                            <td>{r.protocol}</td>
+                            <td>{r.seeders ?? "—"}</td>
+                            <td>{r.sizeBytes ? `${(r.sizeBytes / 1_000_000).toFixed(1)} MB` : "—"}</td>
+                            <td className="actions">
+                              <button
+                                type="button"
+                                className="primary"
+                                disabled={grab.isPending}
+                                onClick={() => grab.mutate(r)}
+                              >
+                                Grab
+                              </button>
+                            </td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  )}
+                </Card>
+              )}
+            </>
+          )}
+        </div>
       </div>
-    </section>
+    </>
   );
 }

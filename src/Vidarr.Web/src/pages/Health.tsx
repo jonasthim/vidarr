@@ -1,5 +1,15 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { Heart, RefreshCw } from "lucide-react";
 import { api, HealthIssue } from "../api";
+import { Card, EmptyState, StatusPill } from "../components/ui";
+
+function severityVariant(s: string) {
+  switch (s) {
+    case "Error":   return "danger" as const;
+    case "Warning": return "warning" as const;
+    default:        return "info" as const;
+  }
+}
 
 export function HealthPage(): JSX.Element {
   const queryClient = useQueryClient();
@@ -13,50 +23,62 @@ export function HealthPage(): JSX.Element {
     onSuccess: () => queryClient.invalidateQueries({ queryKey: ["health"] }),
   });
 
-  if (isLoading) return <p>Loading health…</p>;
-  if (error) return <p className="error">Failed to load health: {(error as Error).message}</p>;
-  const status = data!;
-
   return (
-    <section>
-      <div className="page-header">
-        <h2>Health</h2>
-        <button type="button" disabled={runMutation.isPending} onClick={() => runMutation.mutate()}>
+    <Card
+      title="Health checks"
+      actions={
+        <button
+          type="button"
+          disabled={runMutation.isPending}
+          onClick={() => runMutation.mutate()}
+        >
+          <RefreshCw size={14} />
           {runMutation.isPending ? "Running…" : "Run checks now"}
         </button>
-      </div>
-      <p className="muted">
-        Last run: {status.lastRun ? new Date(status.lastRun).toLocaleString() : "never"}
-      </p>
-      {status.issues.length === 0 ? (
-        <p className="ok">No active issues. Everything looks healthy.</p>
-      ) : (
-        <table className="grid">
-          <thead>
-            <tr>
-              <th>Severity</th>
-              <th>Check</th>
-              <th>Source</th>
-              <th>Message</th>
-            </tr>
-          </thead>
-          <tbody>
-            {status.issues.map((issue, i) => (
-              <tr key={`${issue.checkName}-${issue.source}-${i}`}>
-                <td>
-                  <span className={`badge severity-${issue.severity.toLowerCase()}`}>
-                    {issue.severity}
-                  </span>
-                </td>
-                <td>{issue.checkName}</td>
-                <td>{issue.source}</td>
-                <td>{issue.message}</td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
+      }
+    >
+      {isLoading && <div className="loading-state">Loading…</div>}
+      {error && <div className="error-banner">Failed to load: {(error as Error).message}</div>}
+      {data && (
+        <>
+          <p className="muted">
+            Last run: {data.lastRun ? new Date(data.lastRun).toLocaleString() : "never"}
+          </p>
+          {data.issues.length === 0 ? (
+            <EmptyState
+              icon={<Heart />}
+              title="All checks passing"
+              description="No active issues. Vidarr re-runs health checks every 15 minutes."
+            />
+          ) : (
+            <table className="grid">
+              <thead>
+                <tr>
+                  <th>Severity</th>
+                  <th>Check</th>
+                  <th>Source</th>
+                  <th>Message</th>
+                </tr>
+              </thead>
+              <tbody>
+                {data.issues.map((issue, i) => (
+                  <tr key={`${issue.checkName}-${issue.source}-${i}`}>
+                    <td>
+                      <StatusPill variant={severityVariant(issue.severity)}>
+                        {issue.severity}
+                      </StatusPill>
+                    </td>
+                    <td>{issue.checkName}</td>
+                    <td>{issue.source}</td>
+                    <td>{issue.message}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          )}
+        </>
       )}
-    </section>
+    </Card>
   );
 }
 

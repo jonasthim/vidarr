@@ -77,6 +77,12 @@ export type HealthStatus = {
   issues: HealthIssue[];
 };
 
+export type BackupArtifact = {
+  fileName: string;
+  sizeBytes: number;
+  createdAt: string;
+};
+
 export type Quality = {
   id: number;
   name: string;
@@ -360,6 +366,16 @@ export const api = {
     call<JobRun[]>(`/system/jobs/runs${job ? `?job=${job}` : ""}`),
   listHistory: (artistId?: number) =>
     call<HistoryItem[]>(`/history${artistId ? `?artistId=${artistId}` : ""}`),
+
+  // system
+  getSystemStatus: () =>
+    call<{ version: string; buildtime: string; authenticated: boolean }>("/system/status"),
+
+  // backups
+  listBackups: () => call<BackupArtifact[]>("/system/backup"),
+  createBackup: () => call<BackupArtifact>("/system/backup", { method: "POST" }),
+  deleteBackup: (fileName: string) =>
+    call<void>(`/system/backup/${encodeURIComponent(fileName)}`, { method: "DELETE" }),
 
   // api key (sonarr-style: persisted, rotatable from Settings)
   getApiKey: () => call<{ apiKey: string }>("/system/apikey"),

@@ -1,5 +1,7 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { Play } from "lucide-react";
 import { api } from "../api";
+import { Card, StatusPill } from "../components/ui";
 
 function formatInterval(seconds: number): string {
   if (seconds >= 86400) return `${Math.round(seconds / 86400)}d`;
@@ -27,46 +29,46 @@ export function CommandsPage(): JSX.Element {
   });
 
   return (
-    <section className="commands">
-      <h2>Commands</h2>
+    <Card title="Recurring tasks">
       <p className="muted">
-        Recurring jobs run on their own schedule; click "Run now" to trigger one
-        immediately. Last-run state refreshes every 5 seconds.
+        Each recurring job runs on its own schedule. Trigger one immediately with Run now; last-run
+        state refreshes every five seconds.
       </p>
-      <table>
+      <table className="grid">
         <thead>
           <tr>
             <th>Job</th>
             <th>Interval</th>
             <th>Last run</th>
             <th>Status</th>
-            <th />
+            <th></th>
           </tr>
         </thead>
         <tbody>
           {commands.data?.map((c) => (
             <tr key={c.name}>
-              <td>
-                <strong>{c.name}</strong>
-              </td>
+              <td><strong>{c.name}</strong></td>
               <td>{formatInterval(c.intervalSeconds)}</td>
               <td>{formatTime(c.lastRun)}</td>
               <td>
-                {c.lastRunOk ? (
-                  <span className="muted">✓ ok</span>
-                ) : (
-                  <span className="muted">—</span>
-                )}
+                {c.lastRun
+                  ? (c.lastRunOk
+                      ? <StatusPill variant="success">OK</StatusPill>
+                      : <StatusPill variant="danger">Failed</StatusPill>)
+                  : <StatusPill variant="muted">Not yet run</StatusPill>}
                 {c.recent[0]?.failureReason && (
-                  <div className="error">{c.recent[0].failureReason}</div>
+                  <div className="error-banner" style={{ marginTop: "var(--space-2)" }}>
+                    {c.recent[0].failureReason}
+                  </div>
                 )}
               </td>
-              <td>
+              <td className="actions">
                 <button
                   type="button"
                   disabled={run.isPending}
                   onClick={() => run.mutate(c.name)}
                 >
+                  <Play size={14} />
                   Run now
                 </button>
               </td>
@@ -74,6 +76,6 @@ export function CommandsPage(): JSX.Element {
           ))}
         </tbody>
       </table>
-    </section>
+    </Card>
   );
 }

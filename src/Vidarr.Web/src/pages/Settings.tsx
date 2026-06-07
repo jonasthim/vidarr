@@ -1,4 +1,5 @@
-import { useState } from "react";
+import { Navigate, NavLink, useParams } from "react-router-dom";
+import { PageHeader } from "../components/ui";
 import { ProfilesPanel } from "../components/ProfilesPanel";
 import { RootFoldersPanel } from "../components/RootFoldersPanel";
 import { TagsPanel } from "../components/TagsPanel";
@@ -11,69 +12,56 @@ import { DiscoveryRulesPanel } from "../components/DiscoveryRulesPanel";
 import { NotificationsPanel } from "../components/NotificationsPanel";
 import { SecurityPanel } from "../components/SecurityPanel";
 
-type Pane =
-  | "general"
-  | "security"
-  | "profiles"
-  | "customformats"
-  | "rootfolders"
-  | "tags"
-  | "indexers"
-  | "downloadclients"
-  | "notifications"
-  | "blocklist"
-  | "discoveryrules";
+type SectionDef = {
+  slug: string;
+  label: string;
+  panel: () => JSX.Element;
+};
+
+// Order intentionally mirrors Sonarr's Settings nav as closely as Vidarr's
+// domain allows.
+const SECTIONS: SectionDef[] = [
+  { slug: "mediamanagement", label: "Media Management", panel: GeneralSettingsPanel },
+  { slug: "profiles",        label: "Profiles",         panel: ProfilesPanel },
+  { slug: "quality",         label: "Custom Formats",   panel: CustomFormatsPanel },
+  { slug: "indexers",        label: "Indexers",         panel: IndexersPanel },
+  { slug: "downloadclients", label: "Download Clients", panel: DownloadClientsPanel },
+  { slug: "importlists",     label: "Discovery Rules",  panel: DiscoveryRulesPanel },
+  { slug: "connect",         label: "Connect",          panel: NotificationsPanel },
+  { slug: "tags",            label: "Tags",             panel: TagsPanel },
+  { slug: "rootfolders",     label: "Root Folders",     panel: RootFoldersPanel },
+  { slug: "blocklist",       label: "Blocklist",        panel: BlocklistPanel },
+  { slug: "security",        label: "Security",         panel: SecurityPanel },
+];
 
 export function SettingsPage(): JSX.Element {
-  const [pane, setPane] = useState<Pane>("general");
+  const { section } = useParams<{ section: string }>();
+  const active = SECTIONS.find((s) => s.slug === section);
+  if (!active) return <Navigate to="/settings/mediamanagement" replace />;
+  const Panel = active.panel;
   return (
-    <section className="settings">
-      <aside className="settings-nav">
-        <h2>Settings</h2>
-        <ul>
-          {(
-            [
-              ["general", "Media Management"],
-              ["security", "Security"],
-              ["profiles", "Quality Profiles"],
-              ["customformats", "Custom Formats"],
-              ["indexers", "Indexers"],
-              ["downloadclients", "Download Clients"],
-              ["notifications", "Notifications"],
-              ["discoveryrules", "Discovery Rules"],
-              ["rootfolders", "Root Folders"],
-              ["tags", "Tags"],
-              ["blocklist", "Blocklist"],
-            ] as const
-          ).map(([key, label]) => (
-            <li
-              key={key}
-              className={pane === key ? "active" : ""}
-              onClick={() => setPane(key)}
-              role="button"
-              tabIndex={0}
-              onKeyDown={(e) => {
-                if (e.key === "Enter") setPane(key);
-              }}
-            >
-              {label}
-            </li>
-          ))}
-        </ul>
-      </aside>
-      <div className="settings-pane">
-        {pane === "general" && <GeneralSettingsPanel />}
-        {pane === "security" && <SecurityPanel />}
-        {pane === "profiles" && <ProfilesPanel />}
-        {pane === "customformats" && <CustomFormatsPanel />}
-        {pane === "indexers" && <IndexersPanel />}
-        {pane === "downloadclients" && <DownloadClientsPanel />}
-        {pane === "notifications" && <NotificationsPanel />}
-        {pane === "discoveryrules" && <DiscoveryRulesPanel />}
-        {pane === "rootfolders" && <RootFoldersPanel />}
-        {pane === "tags" && <TagsPanel />}
-        {pane === "blocklist" && <BlocklistPanel />}
+    <>
+      <PageHeader title="Settings" subtitle={active.label} />
+      <div className="settings">
+        <nav className="settings-nav">
+          <h2>Settings</h2>
+          <ul>
+            {SECTIONS.map((s) => (
+              <li key={s.slug}>
+                <NavLink
+                  to={`/settings/${s.slug}`}
+                  className={({ isActive }) => (isActive ? "active" : "")}
+                >
+                  {s.label}
+                </NavLink>
+              </li>
+            ))}
+          </ul>
+        </nav>
+        <div className="settings-pane">
+          <Panel />
+        </div>
       </div>
-    </section>
+    </>
   );
 }

@@ -1,20 +1,20 @@
 import { FormEvent, useState } from "react";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { useLocation, useNavigate } from "react-router-dom";
 import { api } from "../api";
 
-type Props = {
-  onSuccess: () => void;
-};
-
-export function LoginPage({ onSuccess }: Props): JSX.Element {
+export function LoginPage(): JSX.Element {
   const queryClient = useQueryClient();
+  const navigate = useNavigate();
+  const location = useLocation();
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const mutation = useMutation({
     mutationFn: () => api.login(username, password),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["auth-status"] });
-      onSuccess();
+      const from = (location.state as { from?: Location } | null)?.from?.pathname ?? "/library";
+      navigate(from, { replace: true });
     },
   });
 
@@ -27,31 +27,33 @@ export function LoginPage({ onSuccess }: Props): JSX.Element {
     <div className="login-shell">
       <form className="login-card" onSubmit={submit}>
         <h1>Vidarr</h1>
-        <p className="muted">Sign in to continue</p>
-        <label>
-          <span>Username</span>
+        <p className="login-sub muted">Sign in to continue</p>
+        <div className="form-row">
+          <label htmlFor="user"><span>Username</span></label>
           <input
+            id="user"
             type="text"
             autoComplete="username"
             value={username}
             onChange={(e) => setUsername(e.target.value)}
             required
           />
-        </label>
-        <label>
-          <span>Password</span>
+        </div>
+        <div className="form-row">
+          <label htmlFor="pass"><span>Password</span></label>
           <input
+            id="pass"
             type="password"
             autoComplete="current-password"
             value={password}
             onChange={(e) => setPassword(e.target.value)}
             required
           />
-        </label>
+        </div>
         {mutation.error && (
-          <p className="error">{(mutation.error as Error).message}</p>
+          <div className="error-banner">{(mutation.error as Error).message}</div>
         )}
-        <button type="submit" disabled={mutation.isPending}>
+        <button type="submit" className="primary" disabled={mutation.isPending}>
           {mutation.isPending ? "Signing in…" : "Sign in"}
         </button>
       </form>
