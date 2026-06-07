@@ -156,13 +156,16 @@ builder.Services.AddScoped<Vidarr.Rules.IDiscoveryRuleEngine, Vidarr.Rules.Disco
 
 // Phase 7 — Recurring jobs + history.
 builder.Services.AddSingleton<IJobRunHistory, InMemoryJobRunHistory>();
-builder.Services.AddSingleton<IRecurringJobRunner, RecurringJobRunner>();
-builder.Services.AddSingleton<IRecurringJob, Vidarr.Host.Jobs.ArtistRefreshJob>();
-builder.Services.AddSingleton<IRecurringJob, Vidarr.Host.Jobs.RssSyncJob>();
-builder.Services.AddSingleton<IRecurringJob, Vidarr.Host.Jobs.DownloadStatusPollJob>();
-builder.Services.AddSingleton<IRecurringJob, Vidarr.Host.Jobs.WantedVideoSearchJob>();
-builder.Services.AddSingleton<IRecurringJob, Vidarr.Host.Jobs.RuleSetEvaluationJob>();
-builder.Services.AddSingleton<IRecurringJob, Vidarr.Host.Jobs.BackupJob>();
+builder.Services.AddScoped<IRecurringJobRunner, RecurringJobRunner>();
+// Recurring jobs are resolved per-tick inside a fresh DI scope by
+// RecurringJobsHostedService, so they're registered Scoped to let them inject
+// scoped dependencies (DbContext, IBackupService, …) safely.
+builder.Services.AddScoped<IRecurringJob, Vidarr.Host.Jobs.ArtistRefreshJob>();
+builder.Services.AddScoped<IRecurringJob, Vidarr.Host.Jobs.RssSyncJob>();
+builder.Services.AddScoped<IRecurringJob, Vidarr.Host.Jobs.DownloadStatusPollJob>();
+builder.Services.AddScoped<IRecurringJob, Vidarr.Host.Jobs.WantedVideoSearchJob>();
+builder.Services.AddScoped<IRecurringJob, Vidarr.Host.Jobs.RuleSetEvaluationJob>();
+builder.Services.AddScoped<IRecurringJob, Vidarr.Host.Jobs.BackupJob>();
 
 // Phase 13 — Backup pipeline.
 builder.Services.AddSingleton(new Vidarr.Backup.BackupOptions(
@@ -193,7 +196,7 @@ builder.Services.AddSingleton<Vidarr.Health.IHealthMonitor>(sp => new Vidarr.Hea
     new HealthCheckResolver(sp),
     sp.GetRequiredService<IEventBus>(),
     sp.GetRequiredService<ILogger<Vidarr.Health.HealthMonitor>>()));
-builder.Services.AddSingleton<IRecurringJob, Vidarr.Host.Jobs.HealthCheckJob>();
+builder.Services.AddScoped<IRecurringJob, Vidarr.Host.Jobs.HealthCheckJob>();
 builder.Services.AddHostedService<RecurringJobsHostedService>();
 
 var app = builder.Build();
